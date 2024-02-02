@@ -27,4 +27,12 @@ public class User {
     @OneToMany(mappedBy = "user")
     @Nullable
     private List<Token> tokens;
+
+    @OneToMany(mappedBy = "user")
+    @Nullable
+    private List<Image> images;
+
+    @OneToMany(mappedBy = "user")
+    @Nullable
+    private List<Tag> tags;
 }

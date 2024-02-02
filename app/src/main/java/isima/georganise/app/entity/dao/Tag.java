@@ -20,6 +20,10 @@ public class Tag {
     @Nullable
     private String description;
 
+    @ManyToOne
+    @JoinColumn(name = "id", nullable = false)
+    private User user;
+
     @OneToMany(mappedBy = "tag")
     @Nullable
     private List<Token> tokens;

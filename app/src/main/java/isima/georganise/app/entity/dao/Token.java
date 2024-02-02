@@ -17,6 +17,7 @@ public class Token {
 
     private UUID token;
 
+
     private Right right;
 
     @ManyToOne

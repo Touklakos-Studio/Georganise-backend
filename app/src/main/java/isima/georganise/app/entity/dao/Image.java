@@ -1,41 +1,32 @@
 package isima.georganise.app.entity.dao;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import isima.georganise.app.entity.util.GPS;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.sql.Blob;
 import java.util.List;
 
-@Data
 @Entity
-public class Place {
+@Data
+public class Image {
 
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
 
+    private Blob image;
+
     private String name;
-
-    private BigDecimal longitude;
-
-    private BigDecimal latitude;
 
     @Nullable
     private String description;
 
     @ManyToOne
     @JoinColumn(name = "id", nullable = false)
-    private Image image;
-
-    @ManyToOne
-    @JoinColumn(name = "id", nullable = false)
     private User user;
 
-    @ManyToMany(mappedBy = "places")
-    @JsonIgnore
-    private List<Tag> tags;
+    @OneToMany(mappedBy = "image")
+    @Nullable
+    private List<Place> places;
 }
