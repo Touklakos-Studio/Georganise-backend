@@ -1,0 +1,163 @@
+{
+	"info": {
+		"_postman_id": "07f70a93-535c-4943-bd90-640530dd59d1",
+		"name": "Image",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23737663"
+	},
+	"item": [
+		{
+			"name": "getImageById",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}{{path}}/1",
+					"host": [
+						"{{url}}{{path}}"
+					],
+					"path": [
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createImage",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "Name",
+							"value": "Beach",
+							"type": "text"
+						},
+						{
+							"key": "Description",
+							"value": "A beautiful beach",
+							"type": "text"
+						},
+						{
+							"key": "Image",
+							"type": "file",
+							"src": "postman-cloud:///1eec1a44-f52a-4e40-95f1-8bdbc779ed6e"
+						},
+						{
+							"key": "UserId",
+							"value": "1",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{url}}{{path}}",
+					"host": [
+						"{{url}}{{path}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "updateImage",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"UserId\":1,\r\n    \"Name\":\"Mountain\",\r\n    \"Description\":\"A snowy mountain\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}{{path}}/1",
+					"host": [
+						"{{url}}{{path}}"
+					],
+					"path": [
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleteImage",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"UserId\":1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}{{path}}/1",
+					"host": [
+						"{{url}}{{path}}"
+					],
+					"path": [
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getImagesByKeyword",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}{{path}}/word/title",
+					"host": [
+						"{{url}}{{path}}"
+					],
+					"path": [
+						"word",
+						"title"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "path",
+			"value": "/image",
+			"type": "string"
+		}
+	]
+}
