@@ -9,21 +9,26 @@ import java.util.List;
 
 @Entity
 @Data
+@Table(name = "IMAGES")
 public class Image {
 
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "ID")
+    private Long ImageId;
 
+    @Column(name = "IMAGE")
     private Blob image;
 
+    @Column(name = "NAME")
     private String name;
 
     @Nullable
+    @Column(name = "DESCRIPTION")
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "id", nullable = false)
+    @JoinColumn(name = "userId", nullable = false)
     private User user;
 
     @OneToMany(mappedBy = "image")

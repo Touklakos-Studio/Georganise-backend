@@ -9,16 +9,21 @@ import java.util.List;
 
 @Data
 @Entity
+@Table(name = "USERS")
 public class User {
 
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "ID")
+    private Long userId;
 
+    @Column(name = "NICKNAME")
     private String nickname;
 
+    @Column(name = "EMAIL")
     private String email;
 
+    @Column(name = "PASSWORD")
     private String password;
 
     @OneToMany(mappedBy = "user")
@@ -27,6 +32,10 @@ public class User {
     @OneToMany(mappedBy = "user")
     @Nullable
     private List<Token> tokens;
+
+    @OneToMany(mappedBy = "creator")
+    @Nullable
+    private List<Token> tokensCreated;
 
     @OneToMany(mappedBy = "user")
     @Nullable
