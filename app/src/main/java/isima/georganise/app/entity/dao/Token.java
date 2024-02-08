@@ -9,23 +9,31 @@ import java.util.UUID;
 
 @Data
 @Entity
+@Table(name = "TOKENS")
 public class Token {
 
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "ID")
+    private Long tokenId;
 
+    @Column(name = "TOKEN")
     private UUID token;
 
-
-    private Right right;
+    @Column(name = "ACCESSRIGHT")
+    private Right accessRight;
 
     @ManyToOne
-    @JoinColumn(name = "id", nullable = false)
+    @JoinColumn(name = "TAGID", nullable = false)
     private Tag tag;
 
     @ManyToOne
-    @JoinColumn(name = "id", nullable = false)
+    @JoinColumn(name = "USERID", nullable = false, insertable = false, updatable = false)
     @Nullable
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "USERID", nullable = false, insertable = false, updatable = false)
+    @Nullable
+    private User creator;
 }

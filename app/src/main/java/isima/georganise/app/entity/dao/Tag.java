@@ -9,26 +9,35 @@ import java.util.List;
 
 @Data
 @Entity
+@Table(name = "TAGS")
 public class Tag {
 
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "ID")
+    private Long tagId;
 
+    @Column(name = "TITLE")
     private String title;
 
     @Nullable
+    @Column(name = "DESCRIPTION")
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "id", nullable = false)
+    @JoinColumn(name = "userId", nullable = false)
     private User user;
 
     @OneToMany(mappedBy = "tag")
     @Nullable
     private List<Token> tokens;
 
-    @ManyToMany(mappedBy = "tags")
+    @ManyToMany(cascade = { CascadeType.ALL })
+    @JoinTable(
+            name = "PLACESTAGS",
+            joinColumns = { @JoinColumn(name = "TAGID") },
+            inverseJoinColumns = { @JoinColumn(name = "PLACEID") }
+    )
     @JsonIgnore
     private List<Place> places;
 }
