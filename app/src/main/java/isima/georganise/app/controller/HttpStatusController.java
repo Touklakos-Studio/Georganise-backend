@@ -15,7 +15,7 @@ public class HttpStatusController {
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(value = HttpStatus.I_AM_A_TEAPOT, reason = "Something went very wrong")
-    public void handleUnknownError(RuntimeException ex) {
+    public void handleUnknownError(Exception ex) {
         System.err.println(MESSAGE_ERROR + ex.getMessage());
     }
 
