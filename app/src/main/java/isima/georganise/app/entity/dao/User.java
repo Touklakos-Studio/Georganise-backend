@@ -26,6 +26,9 @@ public class User {
     @Column(name = "PASSWORD")
     private String password;
 
+    @Column(name = "TOKEN")
+    private String authToken;
+
     @OneToMany(mappedBy = "user")
     private List<Place> places;
 
