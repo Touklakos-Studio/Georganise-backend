@@ -1,9 +1,11 @@
 package isima.georganise.app.service;
 
 import isima.georganise.app.entity.dao.Token;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public interface TokenService {
     public List<Token> tokens();
     public Token token(Long id);

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class PlaceServiceDefault implements PlaceService{
+public class PlaceServiceImpl implements PlaceService{
 
     @Autowired
     PlacesRepository placesRepository;

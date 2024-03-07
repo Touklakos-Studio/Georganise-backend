@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ImageServiceDefault implements ImageService{
+public class ImageServiceImpl implements ImageService{
 
     @Autowired
     ImagesRepository imagesRepository;
