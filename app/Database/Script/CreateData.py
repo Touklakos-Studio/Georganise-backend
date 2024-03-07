@@ -16,6 +16,7 @@ class users:
         self.nickname = nickname
         self.email = email
         self.password = password
+        self.token = None
         print("User" + succes, self)
 
     def __init__(self):
@@ -30,6 +31,7 @@ class users:
         self.nickname = f"User{self.id}"
         self.email = f"{self.nickname}@email.com"
         self.password = users.hash_password(f"Password{self.id}")
+        self.token = None
 
     @staticmethod
     def hash_password(password):
@@ -38,11 +40,11 @@ class users:
     @staticmethod
     def save_users(users):
         with open(path + 'users.csv', 'w', newline='') as csvfile:
-            fieldnames = ['ID', 'NICKNAME', 'EMAIL', 'PASSWORD']
+            fieldnames = ['ID', 'NICKNAME', 'EMAIL', 'PASSWORD', 'TOKEN']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
             for user in users:
-                writer.writerow({'ID': user.id, 'NICKNAME': user.nickname, 'EMAIL': user.email, 'PASSWORD': user.password})
+                writer.writerow({'ID': user.id, 'NICKNAME': user.nickname, 'EMAIL': user.email, 'PASSWORD': user.password, 'TOKEN': user.token})
 
 class images:
     ids = count(1)
