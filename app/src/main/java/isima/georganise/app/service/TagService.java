@@ -1,9 +1,11 @@
 package isima.georganise.app.service;
 
 import isima.georganise.app.entity.dao.Tag;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public interface TagService {
     public List<Tag> tags();
     public Tag tag(Long id);

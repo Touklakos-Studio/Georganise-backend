@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class TagServiceDefault implements TagService{
+public class TagServiceImpl implements TagService{
     @Autowired
     TagsRepository tagsRepository;
     @Override

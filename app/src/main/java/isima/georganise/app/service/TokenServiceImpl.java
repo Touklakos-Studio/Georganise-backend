@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class TokenServiceDefault implements TokenService{
+public class TokenServiceImpl implements TokenService{
     @Autowired
     TokensRepository tokensRepository;
     @Override

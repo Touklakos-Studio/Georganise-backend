@@ -1,9 +1,11 @@
 package isima.georganise.app.service;
 
 import isima.georganise.app.entity.dao.Image;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public interface ImageService {
     public List<Image> images();
     public Image image(Long id);
