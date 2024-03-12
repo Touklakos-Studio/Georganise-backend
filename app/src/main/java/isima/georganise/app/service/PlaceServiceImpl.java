@@ -2,10 +2,12 @@ package isima.georganise.app.service;
 
 
 import isima.georganise.app.entity.dao.Place;
+import isima.georganise.app.exception.NotFoundException;
 import isima.georganise.app.repository.PlacesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,14 +22,38 @@ public class PlaceServiceImpl implements PlaceService{
     }
 
     @Override
-    public Place place(Long id) {
+    public Place getPlaceById(Long id) {
         Optional<Place> op = placesRepository.findById(id);
-        if(op.isPresent()) {
-            return op.get();
-        }
-        else {
-            return null;
-        }
+        return op.orElseThrow(NotFoundException::new);
+    }
+
+
+    @Override
+    public List<Place> getPlacesByUser(Long id) {
+        Optional<List<Place>> op = placesRepository.findByUserId(id);
+        if (op.isEmpty()) throw new NotFoundException();
+        return op.get();
+    }
+
+    @Override
+    public List<Place> getPlacesByTag(Long id) {
+        Optional<List<Place>> op = placesRepository.findByTagId(id);
+        if (op.isEmpty()) throw new NotFoundException();
+        return op.get();
+    }
+
+    @Override
+    public List<Place> getPlacesByKeyword(String keyword) {
+        Optional<List<Place>> op = placesRepository.findByKeyword(keyword);
+        if (op.isEmpty()) throw new NotFoundException();
+        return op.get();
+    }
+
+    @Override
+    public List<Place> getPlacesByVicinity() {
+        Optional<List<Place>> op = placesRepository.findByVicinity();
+        if (op.isEmpty()) throw new NotFoundException();
+        return op.get();
     }
 
     @Override
@@ -36,14 +62,10 @@ public class PlaceServiceImpl implements PlaceService{
     }
 
     @Override
-    public boolean deletePlace(Long id) {
+    public void deletePlace(Long id) {
         Optional<Place> u = placesRepository.findById(id);
-        if (u.isPresent()) {
-            placesRepository.deleteById(id);
-            return true;
-        } else {
-            return false;
-        }
+        if (u.isEmpty()) throw new NotFoundException();
+        placesRepository.deleteById(id);
     }
 
     @Override
@@ -64,7 +86,7 @@ public class PlaceServiceImpl implements PlaceService{
 
             return placesRepository.save(existingPlace);
         } else {
-            return null;
+            throw new NotFoundException();
         }
     }
 }

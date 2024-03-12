@@ -8,8 +8,9 @@ import java.util.List;
 @Service
 public interface ImageService {
     public List<Image> images();
-    public Image image(Long id);
+    public Image getImagebyId(Long id);
+    public List<Image> getImageByKeyword(String keyword);
     public Image addImage(Image image);
-    public boolean deleteImage(Long id);
+    public void deleteImage(Long id);
     public Image updateImage(Long id,Image image);
 }

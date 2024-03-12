@@ -2,6 +2,7 @@ package isima.georganise.app.service;
 
 
 import isima.georganise.app.entity.dao.Token;
+import isima.georganise.app.exception.NotFoundException;
 import isima.georganise.app.repository.TokensRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,14 +20,21 @@ public class TokenServiceImpl implements TokenService{
     }
 
     @Override
-    public Token token(Long id) {
+    public Token getTokenById(Long id) {
         Optional<Token> op = tokensRepository.findById(id);
-        if(op.isPresent()) {
-            return op.get();
-        }
-        else {
-            return null;
-        }
+        return op.orElseThrow(NotFoundException::new);
+    }
+
+    @Override
+    public Token getTokenByUser(Long id) {
+        Optional<Token> op = tokensRepository.findByUserId(id);
+        return op.orElseThrow(NotFoundException::new);
+    }
+
+    @Override
+    public Token getTokenByTag(Long id) {
+        Optional<Token> op = tokensRepository.findByTagId(id);
+        return op.orElseThrow(NotFoundException::new);
     }
 
     @Override
@@ -35,14 +43,10 @@ public class TokenServiceImpl implements TokenService{
     }
 
     @Override
-    public boolean deleteToken(Long id) {
+    public void deleteToken(Long id) {
         Optional<Token> u = tokensRepository.findById(id);
-        if (u.isPresent()) {
-            tokensRepository.deleteById(id);
-            return true;
-        } else {
-            return false;
-        }
+        if(u.isEmpty()) throw new NotFoundException();
+        tokensRepository.deleteById(id);
     }
 
     @Override
@@ -61,7 +65,7 @@ public class TokenServiceImpl implements TokenService{
 
             return tokensRepository.save(existingToken);
         } else {
-            return null;
+            throw new NotFoundException();
         }
     }
 }

@@ -8,8 +8,12 @@ import java.util.List;
 @Service
 public interface PlaceService {
     public List<Place> places();
-    public Place place(Long id);
+    public Place getPlaceById(Long id);
+    public List<Place> getPlacesByUser(Long id);
+    public List<Place> getPlacesByTag(Long id);
+    public List<Place> getPlacesByKeyword(String keyword);
+    public List<Place> getPlacesByVicinity();
     public Place addPlace(Place place);
-    public boolean deletePlace(Long id);
+    public void deletePlace(Long id);
     public Place updatePlace(Long id,Place place);
 }

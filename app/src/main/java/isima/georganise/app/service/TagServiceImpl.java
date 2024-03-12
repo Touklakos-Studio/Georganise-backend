@@ -2,6 +2,7 @@ package isima.georganise.app.service;
 
 
 import isima.georganise.app.entity.dao.Tag;
+import isima.georganise.app.exception.NotFoundException;
 import isima.georganise.app.repository.TagsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,14 +20,15 @@ public class TagServiceImpl implements TagService{
     }
 
     @Override
-    public Tag tag(Long id) {
+    public Tag getTagById(Long id) {
         Optional<Tag> op = tagsRepository.findById(id);
-        if(op.isPresent()) {
-            return op.get();
-        }
-        else {
-            return null;
-        }
+        return op.orElseThrow(NotFoundException::new);
+    }
+
+    @Override
+    public Tag getTagByKeyword(String keyword) {
+        Optional<Tag> op = tagsRepository.findByKeyword(keyword);
+        return op.orElseThrow(NotFoundException::new);
     }
 
     @Override
@@ -35,14 +37,10 @@ public class TagServiceImpl implements TagService{
     }
 
     @Override
-    public boolean deleteTag(Long id) {
+    public void deleteTag(Long id) {
         Optional<Tag> u = tagsRepository.findById(id);
-        if (u.isPresent()) {
-            tagsRepository.deleteById(id);
-            return true;
-        } else {
-            return false;
-        }
+        if (u.isEmpty()) throw new NotFoundException();
+        tagsRepository.deleteById(id);
     }
 
     @Override
@@ -59,7 +57,7 @@ public class TagServiceImpl implements TagService{
 
             return tagsRepository.save(existingTag);
         } else {
-            return null;
+            throw new NotFoundException();
         }
     }
 }
