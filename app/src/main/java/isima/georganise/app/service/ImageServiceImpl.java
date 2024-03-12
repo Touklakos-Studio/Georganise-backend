@@ -1,6 +1,7 @@
 package isima.georganise.app.service;
 
 import isima.georganise.app.entity.dao.Image;
+import isima.georganise.app.exception.NotFoundException;
 import isima.georganise.app.repository.ImagesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,14 +20,16 @@ public class ImageServiceImpl implements ImageService{
     }
 
     @Override
-    public Image image(Long id) {
+    public Image getImagebyId(Long id) {
         Optional<Image> op = imagesRepository.findById(id);
-        if(op.isPresent()) {
-            return op.get();
-        }
-        else {
-            return null;
-        }
+        return op.orElseThrow(NotFoundException::new);
+    }
+
+    @Override
+    public List<Image> getImageByKeyword(String keyword) {
+        Optional<List<Image>> op = imagesRepository.findByKeyword(keyword);
+        if (op.isEmpty()) throw new NotFoundException();
+        return op.get();
     }
 
     @Override
@@ -35,14 +38,11 @@ public class ImageServiceImpl implements ImageService{
     }
 
     @Override
-    public boolean deleteImage(Long id) {
+    public void deleteImage(Long id) {
         Optional<Image> u = imagesRepository.findById(id);
-        if (u.isPresent()) {
-            imagesRepository.deleteById(id);
-            return true;
-        } else {
-            return false;
-        }
+        if(u.isEmpty()) throw new NotFoundException();
+
+        imagesRepository.deleteById(id);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class ImageServiceImpl implements ImageService{
 
             return imagesRepository.save(existingImage);
         } else {
-            return null;
+            throw new NotFoundException();
         }
     }
 }

@@ -2,6 +2,7 @@ package isima.georganise.app.service;
 
 
 import isima.georganise.app.entity.dao.User;
+import isima.georganise.app.exception.NotFoundException;
 import isima.georganise.app.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,14 +21,9 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public User user(Long id) {
+    public User getUserById(Long id) {
         Optional<User> op = usersRepository.findById(id);
-        if(op.isPresent()) {
-            return op.get();
-        }
-        else {
-            return null;
-        }
+        return op.orElseThrow(NotFoundException::new);
     }
 
     @Override
@@ -41,16 +37,10 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public boolean deleteUser(Long id) {
+    public void deleteUser(Long id) {
         Optional<User> u = usersRepository.findById(id);
-        if (u.isPresent()) {
-            // User found, delete it
-            usersRepository.deleteById(id);
-            return true;
-        } else {
-            // User not found
-            return false;
-        }
+        if(u.isEmpty()) throw new NotFoundException();
+        usersRepository.deleteById(id);
     }
 
     @Override
@@ -73,8 +63,7 @@ public class UserServiceImpl implements UserService{
 
             return usersRepository.save(existingUser);
         } else {
-            // User not found
-            return null;
+            throw new NotFoundException();
         }
     }
 }

@@ -8,8 +8,9 @@ import java.util.List;
 @Service
 public interface TagService {
     public List<Tag> tags();
-    public Tag tag(Long id);
+    public Tag getTagById(Long id);
+    public Tag getTagByKeyword(String keyword);
     public Tag addTag(Tag tag);
-    public boolean deleteTag(Long id);
+    public void deleteTag(Long id);
     public Tag updateTag(Long id,Tag tag);
 }
