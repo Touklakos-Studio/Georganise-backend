@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/image")
@@ -18,33 +19,33 @@ public class ImageController {
     private ImageService imageService;
 
     @GetMapping(path = "", produces = "application/json")
-    public ResponseEntity<Iterable<Image>> getImages() {
-        return ResponseEntity.ok(imageService.getAllImages());
+    public ResponseEntity<Iterable<Image>> getImages(@CookieValue("authToken") UUID authToken) {
+        return ResponseEntity.ok(imageService.getAllImages(authToken));
     }
 
     @GetMapping(path="/{id}", produces = "application/json")
-    public ResponseEntity<Image> getImageById(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(imageService.getImageById(id));
+    public ResponseEntity<Image> getImageById(@CookieValue("authToken") UUID authToken, @PathVariable("id") Long id) {
+        return ResponseEntity.ok(imageService.getImageById(authToken, id));
     }
 
     @GetMapping(path="/keyword/{keyword}", produces = "application/json")
-    public ResponseEntity<List<Image>> getImagesByKeyword(@PathVariable("keyword") String keyword) {
-        return ResponseEntity.ok(imageService.getImageByKeyword(keyword));
+    public ResponseEntity<Iterable<Image>> getImagesByKeyword(@CookieValue("authToken") UUID authToken, @PathVariable("keyword") String keyword) {
+        return ResponseEntity.ok(imageService.getImageByKeyword(authToken, keyword));
     }
 
     @PostMapping(path="", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Image> createImage(@RequestBody ImageCreationDTO image) {
-        return ResponseEntity.ok(imageService.createImage(image));
+    public ResponseEntity<Image> createImage(@CookieValue("authToken") UUID authToken, @RequestBody ImageCreationDTO image) {
+        return ResponseEntity.ok(imageService.createImage(authToken, image));
     }
 
     @PutMapping(path="/{id}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Image> updateImage(@PathVariable("id") Long id, @RequestBody ImageUpdateDTO image) {
-        return ResponseEntity.ok(imageService.updateImage(id, image));
+    public ResponseEntity<Image> updateImage(@CookieValue("authToken") UUID authToken, @PathVariable("id") Long id, @RequestBody ImageUpdateDTO image) {
+        return ResponseEntity.ok(imageService.updateImage(authToken, id, image));
     }
 
     @DeleteMapping(path="/{id}")
-    public ResponseEntity<Void> deleteImage(@PathVariable("id") Long id) {
-        imageService.deleteImage(id);
+    public ResponseEntity<Void> deleteImage(@CookieValue("authToken") UUID authToken, @PathVariable("id") Long id) {
+        imageService.deleteImage(authToken, id);
         return ResponseEntity.ok().build();
     }
 }

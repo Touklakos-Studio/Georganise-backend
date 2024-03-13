@@ -6,20 +6,21 @@ import isima.georganise.app.entity.dto.ImageUpdateDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public interface ImageService {
 
-    public List<Image> getAllImages();
+    public Iterable<Image> getAllImages(UUID authToken);
 
-    public Image getImageById(Long id);
+    public Image getImageById(UUID authToken, Long id);
 
-    public List<Image> getImageByKeyword(String keyword);
+    public Iterable<Image> getImageByKeyword(UUID authToken, String keyword);
 
-    public Image createImage(ImageCreationDTO image);
+    public Image createImage(UUID authToken, ImageCreationDTO image);
 
-    public void deleteImage(Long id);
+    public void deleteImage(UUID authToken, Long id);
 
-    public Image updateImage(Long id, ImageUpdateDTO imageUpdateDTO);
+    public Image updateImage(UUID authToken, Long id, ImageUpdateDTO imageUpdateDTO);
 
 }

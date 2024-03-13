@@ -10,6 +10,13 @@ import java.util.Optional;
 
 @Repository
 public interface ImagesRepository extends JpaRepository<Image, Long> {
-    @Query("SELECT i FROM Image i WHERE i.name LIKE %:keyword% OR i.description LIKE %:keyword%")
-    Optional<List<Image>> findByKeyword(String keyword);
+
+    @Query("SELECT i FROM Image i WHERE (i.name LIKE %:keyword% OR i.description LIKE %:keyword%) AND (i.userId = :userId OR i.isPublic)")
+    Optional<Iterable<Image>> findByKeywordAndUserId(String keyword, Long userId);
+
+    @Query("SELECT i FROM Image i WHERE i.imageId = :imageId AND (i.userId = :userId OR i.isPublic)")
+    Optional<Image> findByImageIdAndUserId(Long imageId, Long userId);
+
+    @Query("SELECT i FROM Image i WHERE i.isPublic")
+    Iterable<Image> findAllPublic();
 }

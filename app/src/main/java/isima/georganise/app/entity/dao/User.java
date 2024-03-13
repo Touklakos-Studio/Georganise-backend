@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Entity
@@ -31,11 +32,12 @@ public class User implements Serializable {
     private String email;
 
     @Column(name = "TOKEN", unique = true)
-    private String authToken;
+    private UUID authToken;
 
     public User(UserCreationDTO user) {
         this.nickname = user.getNickname();
         this.password = user.getPassword();
         this.email = user.getEmail();
+        this.authToken = UUID.randomUUID();
     }
 }
