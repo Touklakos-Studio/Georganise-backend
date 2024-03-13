@@ -7,6 +7,20 @@
 	},
 	"item": [
 		{
+			"name": "getImages",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}{{path}}",
+					"host": [
+						"{{url}}{{path}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "getImageById",
 			"request": {
 				"method": "GET",
@@ -24,6 +38,24 @@
 			"response": []
 		},
 		{
+			"name": "getImagesByKeyword",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}{{path}}/keyword/Image",
+					"host": [
+						"{{url}}{{path}}"
+					],
+					"path": [
+						"keyword",
+						"Image"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "createImage",
 			"request": {
 				"method": "POST",
@@ -32,23 +64,23 @@
 					"mode": "formdata",
 					"formdata": [
 						{
-							"key": "Name",
+							"key": "name",
 							"value": "Beach",
 							"type": "text"
 						},
 						{
-							"key": "Description",
+							"key": "description",
 							"value": "A beautiful beach",
 							"type": "text"
 						},
 						{
-							"key": "Image",
+							"key": "imageValue",
 							"type": "file",
 							"src": "postman-cloud:///1eec1a44-f52a-4e40-95f1-8bdbc779ed6e"
 						},
 						{
-							"key": "UserId",
-							"value": "1",
+							"key": "isPublic",
+							"value": "true",
 							"type": "text"
 						}
 					]
@@ -69,7 +101,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"UserId\":1,\r\n    \"Name\":\"Mountain\",\r\n    \"Description\":\"A snowy mountain\"\r\n}",
+					"raw": "{\r\n    \"Name\":\"Mountain\",\r\n    \"Description\":\"A snowy mountain\",\r\n    \"isPublic\":true\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -93,15 +125,6 @@
 			"request": {
 				"method": "DELETE",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"UserId\":1\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
 				"url": {
 					"raw": "{{url}}{{path}}/1",
 					"host": [
@@ -109,24 +132,6 @@
 					],
 					"path": [
 						"1"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "getImagesByKeyword",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{url}}{{path}}/word/title",
-					"host": [
-						"{{url}}{{path}}"
-					],
-					"path": [
-						"word",
-						"title"
 					]
 				}
 			},

@@ -7,22 +7,24 @@
 	},
 	"item": [
 		{
-			"name": "getPlaceById",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
+			"name": "getPlaces",
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"UserId\":1\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
+				"url": {
+					"raw": "{{url}}{{path}}",
+					"host": [
+						"{{url}}{{path}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getPlaceById",
+			"request": {
+				"method": "GET",
+				"header": [],
 				"url": {
 					"raw": "{{url}}{{path}}/1",
 					"host": [
@@ -36,13 +38,93 @@
 			"response": []
 		},
 		{
+			"name": "getPlacesByUser",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}{{path}}/user/1",
+					"host": [
+						"{{url}}{{path}}"
+					],
+					"path": [
+						"user",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getPlacesByTag",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}{{path}}/tag/1",
+					"host": [
+						"{{url}}{{path}}"
+					],
+					"path": [
+						"tag",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getPlacesByKeyword",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}{{path}}/keyword/Place",
+					"host": [
+						"{{url}}{{path}}"
+					],
+					"path": [
+						"keyword",
+						"Place"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getPlacesByVicinity",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Lat\":0.0,\r\n    \"Long\":0.0,\r\n    \"Radius\":10\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}{{path}}",
+					"host": [
+						"{{url}}{{path}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "createPlace",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"Name\":\"Beach\",\r\n    \"Description\":\"A beautifull beach\",\r\n    \"Lat\":0.0,\r\n    \"Long\":0.0,\r\n    \"UserId\":1,\r\n    \"ImageId\":1\r\n}",
+					"raw": "{\r\n    \"Name\":\"Beach\",\r\n    \"Description\":\"A beautifull beach\",\r\n    \"Lat\":0.0,\r\n    \"Long\":0.0,\r\n    \"ImageId\":1,\r\n    \"tagIds\":[\r\n        1,\r\n        2\r\n    ]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -65,7 +147,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"UserRequesterId\":1,\r\n    \"Name\":\"Mountain\",\r\n    \"Description\":\"A snowy peak\",\r\n    \"Lat\":0.0,\r\n    \"Long\":0.0,\r\n    \"UserId\":1,\r\n    \"ImageId\":1\r\n}",
+					"raw": "{\r\n    \"Name\":\"Mountain\",\r\n    \"Description\":\"A snowy peak\",\r\n    \"Lat\":0.0,\r\n    \"Long\":0.0,\r\n    \"ImageId\":1,\r\n    \"tagIds\":[\r\n        1,\r\n        2\r\n    ]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -89,15 +171,6 @@
 			"request": {
 				"method": "DELETE",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"UserId\":1\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
 				"url": {
 					"raw": "{{url}}{{path}}/1",
 					"host": [
