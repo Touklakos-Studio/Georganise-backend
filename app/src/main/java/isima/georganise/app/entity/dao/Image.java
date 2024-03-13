@@ -34,9 +34,14 @@ public class Image implements Serializable {
     @Column(name = "DESCRIPTION")
     private String description;
 
-    public Image(ImageCreationDTO imageCreationDTO) {
+    @Column(name = "PUBLIC", nullable = false)
+    private boolean isPublic;
+
+    public Image(ImageCreationDTO imageCreationDTO, Long userId) {
+        this.userId = userId;
         this.imageValue = imageCreationDTO.getImageValue();
         this.name = imageCreationDTO.getName();
         this.description = imageCreationDTO.getDescription();
+        this.isPublic = imageCreationDTO.isPublic();
     }
 }

@@ -3,10 +3,10 @@ package isima.georganise.app.exception;
 public class WrongPasswordException extends RuntimeException {
 
         public WrongPasswordException() {
-            super();
+            super("Wrong password.");
         }
 
         public WrongPasswordException(String message) {
-            super(message);
+            super("Wrong password for: " + message);
         }
 }

@@ -1,9 +1,8 @@
 package isima.georganise.app.controller;
 
-import isima.georganise.app.exception.NotFoundException;
-import isima.georganise.app.exception.UnimplementedException;
-import isima.georganise.app.exception.WrongPasswordException;
+import isima.georganise.app.exception.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -40,6 +39,24 @@ public class HttpStatusController {
     @ExceptionHandler(UnimplementedException.class)
     @ResponseStatus(value = HttpStatus.NOT_IMPLEMENTED, reason = "Not implemented")
     public void handleNotImplementedError(RuntimeException ex) {
+        System.err.println(MESSAGE_ERROR + ex.getMessage());
+    }
+
+    @ExceptionHandler(NotLoggedException.class)
+    @ResponseStatus(value = HttpStatus.UNAUTHORIZED, reason = "Not logged")
+    public void handleNotLoggedError(RuntimeException ex) {
+        System.err.println(MESSAGE_ERROR + ex.getMessage());
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    @ResponseStatus(value = HttpStatus.UNAUTHORIZED, reason = "Unauthorized")
+    public void handleUnauthorizedError(RuntimeException ex) {
+        System.err.println(MESSAGE_ERROR + ex.getMessage());
+    }
+
+    @ExceptionHandler(MissingRequestCookieException.class)
+    @ResponseStatus(value = HttpStatus.UNAUTHORIZED, reason = "Not logged")
+    public void handleMissingRequestCookieError(Exception ex) {
         System.err.println(MESSAGE_ERROR + ex.getMessage());
     }
 }

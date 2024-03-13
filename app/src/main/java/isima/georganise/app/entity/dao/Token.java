@@ -40,7 +40,8 @@ public class Token implements Serializable {
     @Column(name = "TAGID", updatable = false, nullable = false)
     private Long tagId;
 
-    public Token(TokenCreationDTO token) {
+    public Token(TokenCreationDTO token, Long creatorId) {
+        this.creatorId = creatorId;
         this.tokenValue = UUID.randomUUID();
         this.accessRight = token.getAccessRight();
         this.userId = token.getUserId();

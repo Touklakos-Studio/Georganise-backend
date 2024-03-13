@@ -48,12 +48,13 @@ class users:
 
 class images:
     ids = count(1)
-    def __init__(self, image, name, description, user):
+    def __init__(self, image, name, description, user, public):
         self.id = next(self.ids)
         self.user = user
         self.image = image
         self.name = name
         self.description = description
+        self.public = public
         print("Image" + succes, self)
 
     def __init__(self, user):
@@ -70,15 +71,16 @@ class images:
             self.image = f.read()
         self.name = f"Image{self.id}"
         self.description = f"Description{self.id}"
+        self.public = random.choice([True, False])
 
     @staticmethod
     def save_images(images):
         with open(path + 'images.csv', 'w', newline='') as csvfile:
-            fieldnames = ['ID', 'IMAGE', 'NAME', 'DESCRIPTION', 'USERID']
+            fieldnames = ['ID', 'IMAGE', 'NAME', 'DESCRIPTION', 'USERID', 'PUBLIC']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
             for image in images:
-                writer.writerow({'ID': image.id, 'IMAGE': image.image, 'NAME': image.name, 'DESCRIPTION': image.description, 'USERID': image.user.id})
+                writer.writerow({'ID': image.id, 'IMAGE': image.image, 'NAME': image.name, 'DESCRIPTION': image.description, 'USERID': image.user.id, 'PUBLIC': image.public})
 
 class places:
     ids = count(1)
@@ -271,7 +273,7 @@ def innit_data(nb_users, nb_tags, nb_images):
 
     return users_list, places_list, tags_list, places_tags_list, tokens_list, image_list
 
-users_list, places_list, tags_list, places_tags_list, tokens_list, image_list = innit_data(100, 50, 1)
+users_list, places_list, tags_list, places_tags_list, tokens_list, image_list = innit_data(100, 50, 10)
 
 users.save_users(users_list)
 tags.save_tags(tags_list)

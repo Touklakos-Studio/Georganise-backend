@@ -10,4 +10,6 @@ public class ImageUpdateDTO implements Serializable {
     private String name;
 
     private String description;
+
+    private Boolean isPublic;
 }
