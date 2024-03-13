@@ -1,52 +1,54 @@
 package isima.georganise.app.entity.dao;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import isima.georganise.app.entity.util.GPS;
-import jakarta.annotation.Nullable;
+import com.fasterxml.jackson.annotation.*;
+import isima.georganise.app.entity.dto.PlaceCreationDTO;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Blob;
 import java.util.List;
 
 @Data
 @Entity
+@NoArgsConstructor
 @Table(name = "PLACES")
-public class Place {
+public class Place implements Serializable {
 
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    @Column(name = "ID")
+    @Column(name = "ID", updatable = false, nullable = false, unique = true)
     private Long placeId;
 
-    @Column(name = "NAME")
-    private String name;
-
-    @Column(name = "LONGITUDE")
-    private BigDecimal longitude;
-
-    @Column(name = "LATITUDE")
+    @Column(name = "LATITUDE", nullable = false)
     private BigDecimal latitude;
 
-    @Nullable
+    @Column(name = "LONGITUDE", nullable = false)
+    private BigDecimal longitude;
+
+    @Column(name = "NAME", nullable = false)
+    private String name;
+
     @Column(name = "DESCRIPTION")
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "imageId", nullable = false)
-    private Image image;
+    @Column(name = "IMAGEID", nullable = false)
+    private Long imageId;
 
-    @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
-    private User user;
+    @Column(name = "USERID", updatable = false, nullable = false)
+    private Long userId;
 
-    @ManyToMany(cascade = { CascadeType.ALL })
-    @JoinTable(
-            name = "PLACESTAGS",
-            joinColumns = { @JoinColumn(name = "PLACEID") },
-            inverseJoinColumns = { @JoinColumn(name = "TAGID") }
-    )
-    @JsonIgnore
-    private List<Tag> tags;
+    @OneToMany(mappedBy = "place")
+    @JsonManagedReference
+    private List<PlaceTag> placeTags;
+
+    public Place(PlaceCreationDTO placeCreationDTO, Long userId) {
+        this.latitude = placeCreationDTO.getLatitude();
+        this.longitude = placeCreationDTO.getLongitude();
+        this.name = placeCreationDTO.getName();
+        this.description = placeCreationDTO.getDescription();
+        this.imageId = placeCreationDTO.getImageId();
+        this.userId = userId;
+    }
 }

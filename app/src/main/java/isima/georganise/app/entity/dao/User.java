@@ -1,50 +1,41 @@
 package isima.georganise.app.entity.dao;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.*;
+import isima.georganise.app.entity.dto.UserCreationDTO;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
 @Entity
+@NoArgsConstructor
 @Table(name = "USERS")
-public class User {
+public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    @Column(name = "ID")
+    @Column(name = "ID", updatable = false, nullable = false, unique = true)
     private Long userId;
 
-    @Column(name = "NICKNAME")
+    @Column(name = "NICKNAME", nullable = false, unique = true)
     private String nickname;
 
-    @Column(name = "EMAIL")
-    private String email;
-
-    @Column(name = "PASSWORD")
+    @Column(name = "PASSWORD", nullable = false)
     private String password;
 
-    @Column(name = "TOKEN")
+    @Column(name = "EMAIL", nullable = false, unique = true)
+    private String email;
+
+    @Column(name = "TOKEN", unique = true)
     private String authToken;
 
-    @OneToMany(mappedBy = "user")
-    private List<Place> places;
-
-    @OneToMany(mappedBy = "user")
-    @Nullable
-    private List<Token> tokens;
-
-    @OneToMany(mappedBy = "creator")
-    @Nullable
-    private List<Token> tokensCreated;
-
-    @OneToMany(mappedBy = "user")
-    @Nullable
-    private List<Image> images;
-
-    @OneToMany(mappedBy = "user")
-    @Nullable
-    private List<Tag> tags;
+    public User(UserCreationDTO user) {
+        this.nickname = user.getNickname();
+        this.password = user.getPassword();
+        this.email = user.getEmail();
+    }
 }

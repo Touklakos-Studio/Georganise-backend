@@ -1,43 +1,41 @@
 package isima.georganise.app.entity.dao;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.annotation.Nullable;
+import com.fasterxml.jackson.annotation.*;
+import isima.georganise.app.entity.dto.TagCreationDTO;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
 @Entity
+@NoArgsConstructor
 @Table(name = "TAGS")
-public class Tag {
+public class Tag implements Serializable {
 
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    @Column(name = "ID")
+    @Column(name = "ID", updatable = false, nullable = false, unique = true)
     private Long tagId;
 
-    @Column(name = "TITLE")
+    @Column(name = "TITLE", nullable = false, unique = true)
     private String title;
 
-    @Nullable
     @Column(name = "DESCRIPTION")
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
-    private User user;
+    @Column(name = "USERID", updatable = false, nullable = false)
+    private Long userId;
 
     @OneToMany(mappedBy = "tag")
-    @Nullable
-    private List<Token> tokens;
+    @JsonManagedReference
+    private List<PlaceTag> placeTags;
 
-    @ManyToMany(cascade = { CascadeType.ALL })
-    @JoinTable(
-            name = "PLACESTAGS",
-            joinColumns = { @JoinColumn(name = "TAGID") },
-            inverseJoinColumns = { @JoinColumn(name = "PLACEID") }
-    )
-    @JsonIgnore
-    private List<Place> places;
+    public Tag(TagCreationDTO tag, Long userId) {
+        this.title = tag.getTitle();
+        this.description = tag.getDescription();
+        this.userId = userId;
+    }
 }

@@ -1,37 +1,42 @@
 package isima.georganise.app.entity.dao;
 
+import com.fasterxml.jackson.annotation.*;
+import isima.georganise.app.entity.dto.ImageCreationDTO;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.sql.Blob;
 import java.util.List;
 
 @Entity
 @Data
+@NoArgsConstructor
 @Table(name = "IMAGES")
-public class Image {
+public class Image implements Serializable {
 
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    @Column(name = "ID")
-    private Long ImageId;
+    @Column(name = "ID", updatable = false, nullable = false, unique = true)
+    private Long imageId;
 
-    @Column(name = "IMAGE")
-    private Blob image;
+    @Column(name = "USERID", updatable = false, nullable = false)
+    private Long userId;
 
-    @Column(name = "NAME")
+    @Column(name = "IMAGE", updatable = false, nullable = false)
+    private byte[] imageValue;
+
+    @Column(name = "NAME", nullable = false)
     private String name;
 
-    @Nullable
     @Column(name = "DESCRIPTION")
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
-    private User user;
-
-    @OneToMany(mappedBy = "image")
-    @Nullable
-    private List<Place> places;
+    public Image(ImageCreationDTO imageCreationDTO) {
+        this.imageValue = imageCreationDTO.getImageValue();
+        this.name = imageCreationDTO.getName();
+        this.description = imageCreationDTO.getDescription();
+    }
 }
