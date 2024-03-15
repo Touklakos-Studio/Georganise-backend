@@ -44,7 +44,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"Nickname\":\"Arthur\",\r\n    \"Password\":\"PasswordArthur\",\r\n    \"Email\":\"arthur.loubet@email.com\"\r\n}",
+					"raw": "{\r\n    \"nickname\":\"Arthur\",\r\n    \"password\":\"PasswordArthur\",\r\n    \"email\":\"arthur.loubet@email.com\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -67,7 +67,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"Nickname\":\"Arthur Loubet\",\r\n    \"Password\":\"PasswordArthur%\",\r\n    \"Email\":\"arthur.loubet@gmail.com\"\r\n}",
+					"raw": "{\r\n    \"nickname\":\"Arthur Loubet\",\r\n    \"password\":\"PasswordArthur%\",\r\n    \"email\":\"arthur.loubet@gmail.com\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
