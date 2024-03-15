@@ -11,8 +11,6 @@ import isima.georganise.app.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -46,10 +44,17 @@ public class ImageServiceImpl implements ImageService{
     }
 
     @Override
-    public Image createImage(UUID authToken, ImageCreationDTO image) {
+    public Image createImage(UUID authToken, ImageCreationDTO imageCreation) {
         User userCurrent = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
 
-        return imagesRepository.saveAndFlush(new Image(image, userCurrent.getUserId()));
+        Image image;
+        try {
+            image = imagesRepository.saveAndFlush(new Image(imageCreation, userCurrent.getUserId()));
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
+
+        return image;
     }
 
     @Override

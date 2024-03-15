@@ -1,15 +1,12 @@
 package isima.georganise.app.entity.dao;
 
-import com.fasterxml.jackson.annotation.*;
 import isima.georganise.app.entity.dto.ImageCreationDTO;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.IOException;
 import java.io.Serializable;
-import java.sql.Blob;
-import java.util.List;
 
 @Entity
 @Data
@@ -37,9 +34,9 @@ public class Image implements Serializable {
     @Column(name = "PUBLIC", nullable = false)
     private boolean isPublic;
 
-    public Image(ImageCreationDTO imageCreationDTO, Long userId) {
+    public Image(ImageCreationDTO imageCreationDTO, Long userId) throws IOException {
         this.userId = userId;
-        this.imageValue = imageCreationDTO.getImageValue();
+        this.imageValue = imageCreationDTO.getImageValue().getBytes();
         this.name = imageCreationDTO.getName();
         this.description = imageCreationDTO.getDescription();
         this.isPublic = imageCreationDTO.isPublic();
