@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -33,8 +32,8 @@ public class ImageController {
         return ResponseEntity.ok(imageService.getImageByKeyword(authToken, keyword));
     }
 
-    @PostMapping(path="", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Image> createImage(@CookieValue("authToken") UUID authToken, @RequestBody ImageCreationDTO image) {
+    @PostMapping(path="", consumes = "multipart/form-data", produces = "application/json")
+    public ResponseEntity<Image> createImage(@CookieValue("authToken") UUID authToken, @ModelAttribute ImageCreationDTO image) {
         return ResponseEntity.ok(imageService.createImage(authToken, image));
     }
 

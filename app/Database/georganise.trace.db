@@ -1539,3 +1539,6 @@ Caused by: org.h2.mvstore.MVStoreException: The file is locked: C:/Users/arthu/I
 	at org.h2.mvstore.SingleFileStore.open(SingleFileStore.java:81)
 	at org.h2.mvstore.MVStore.<init>(MVStore.java:286)
 	... 55 more
+2024-03-15 17:11:58.955504+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: L'objet est déjà fermé
+The object is already closed [90007-224]
