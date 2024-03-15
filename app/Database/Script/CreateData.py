@@ -255,12 +255,13 @@ def innit_data(nb_users, nb_tags, nb_images):
     
     places_tags_list = []
     for place in places_list:
-        places_tags_list_temp = [places_tags(place) for _ in range(random.randint(0, 10))]
-        places_tags_list.extend(places_tags_list_temp)
+        tags_user = [tag for tag in tags_list if tag.user == place.user]
+        places_tags_list_temp = [places_tags(place) for _ in range(random.randint(0, len(tags_user)))]
+        for place_tag in places_tags_list_temp:
+            while not place_tag.add_tag(random.choice(tags_user)):
+                continue
 
-    for place_tag in places_tags_list:
-        while not place_tag.add_tag(random.choice(tags_list)):
-            continue
+        places_tags_list.extend(places_tags_list_temp)
 
     tokens_list = []
     for tag in tags_list:
