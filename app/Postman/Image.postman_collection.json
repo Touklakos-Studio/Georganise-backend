@@ -101,7 +101,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"Name\":\"Mountain\",\r\n    \"Description\":\"A snowy mountain\",\r\n    \"isPublic\":true\r\n}",
+					"raw": "{\r\n    \"name\":\"Mountain\",\r\n    \"description\":\"A snowy mountain\",\r\n    \"isPublic\":true\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -109,12 +109,12 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}{{path}}/1",
+					"raw": "{{url}}{{path}}/11",
 					"host": [
 						"{{url}}{{path}}"
 					],
 					"path": [
-						"1"
+						"11"
 					]
 				}
 			},
@@ -126,12 +126,12 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "{{url}}{{path}}/1",
+					"raw": "{{url}}{{path}}/11",
 					"host": [
 						"{{url}}{{path}}"
 					],
 					"path": [
-						"1"
+						"11"
 					]
 				}
 			},
