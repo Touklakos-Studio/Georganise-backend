@@ -101,5 +101,10 @@ public class UserServiceImpl implements UserService {
 
         usersRepository.saveAndFlush(userToLogout);
     }
+
+    @Override
+    public User getMe(UUID authToken) {
+        return usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
+    }
 }
 

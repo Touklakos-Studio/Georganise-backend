@@ -181,6 +181,23 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "getConnectedUser",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}{{path}}/me",
+					"host": [
+						"{{url}}{{path}}"
+					],
+					"path": [
+						"me"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {

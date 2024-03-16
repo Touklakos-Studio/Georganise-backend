@@ -36,6 +36,11 @@ public class UsersController {
         return ResponseEntity.ok(userService.getUserById(authToken, id));
     }
 
+    @GetMapping(path = "/me", produces = "application/json")
+    public @NotNull ResponseEntity<User> getMe(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken) {
+        return ResponseEntity.ok(userService.getMe(authToken));
+    }
+
     @PostMapping(path = "", consumes = "application/json", produces = "application/json")
     public @NotNull ResponseEntity<Void> createUser(@RequestBody UserCreationDTO user, @NotNull HttpServletResponse response) {
 
