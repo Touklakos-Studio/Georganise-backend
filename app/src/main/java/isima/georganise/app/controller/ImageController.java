@@ -2,6 +2,7 @@ package isima.georganise.app.controller;
 
 import isima.georganise.app.entity.dao.Image;
 import isima.georganise.app.entity.dto.ImageCreationDTO;
+import isima.georganise.app.entity.dto.ImageDTO;
 import isima.georganise.app.entity.dto.ImageUpdateDTO;
 import isima.georganise.app.service.image.ImageService;
 import org.jetbrains.annotations.NotNull;
@@ -26,27 +27,27 @@ public class ImageController {
     }
 
     @GetMapping(path = "", produces = "application/json")
-    public @NotNull ResponseEntity<Iterable<Image>> getImages(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken) {
+    public @NotNull ResponseEntity<Iterable<ImageDTO>> getImages(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken) {
         return ResponseEntity.ok(imageService.getAllImages(authToken));
     }
 
     @GetMapping(path = "/{id}", produces = "application/json")
-    public @NotNull ResponseEntity<Image> getImageById(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @PathVariable("id") Long id) {
+    public @NotNull ResponseEntity<ImageDTO> getImageById(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @PathVariable("id") Long id) {
         return ResponseEntity.ok(imageService.getImageById(authToken, id));
     }
 
     @GetMapping(path = "/keyword/{keyword}", produces = "application/json")
-    public @NotNull ResponseEntity<Iterable<Image>> getImagesByKeyword(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @PathVariable("keyword") String keyword) {
+    public @NotNull ResponseEntity<Iterable<ImageDTO>> getImagesByKeyword(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @PathVariable("keyword") String keyword) {
         return ResponseEntity.ok(imageService.getImageByKeyword(authToken, keyword));
     }
 
     @PostMapping(path = "", consumes = "multipart/form-data", produces = "application/json")
-    public @NotNull ResponseEntity<Image> createImage(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @ModelAttribute ImageCreationDTO image) {
+    public @NotNull ResponseEntity<ImageDTO> createImage(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @ModelAttribute ImageCreationDTO image) {
         return ResponseEntity.ok(imageService.createImage(authToken, image));
     }
 
     @PutMapping(path = "/{id}", consumes = "application/json", produces = "application/json")
-    public @NotNull ResponseEntity<Image> updateImage(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @PathVariable("id") Long id, @RequestBody ImageUpdateDTO image) {
+    public @NotNull ResponseEntity<ImageDTO> updateImage(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @PathVariable("id") Long id, @RequestBody ImageUpdateDTO image) {
         return ResponseEntity.ok(imageService.updateImage(authToken, id, image));
     }
 

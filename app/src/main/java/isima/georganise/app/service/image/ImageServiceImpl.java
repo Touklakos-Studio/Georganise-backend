@@ -3,6 +3,7 @@ package isima.georganise.app.service.image;
 import isima.georganise.app.entity.dao.Image;
 import isima.georganise.app.entity.dao.User;
 import isima.georganise.app.entity.dto.ImageCreationDTO;
+import isima.georganise.app.entity.dto.ImageDTO;
 import isima.georganise.app.entity.dto.ImageUpdateDTO;
 import isima.georganise.app.exception.NotFoundException;
 import isima.georganise.app.exception.NotLoggedException;
@@ -31,28 +32,31 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public Iterable<Image> getAllImages(UUID authToken) {
+    public Iterable<ImageDTO> getAllImages(UUID authToken) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
+        Iterable<Image> images = imagesRepository.findAllPublic(currentUser.getUserId());
 
-        return imagesRepository.findAllPublic(currentUser.getUserId());
+        return ImageDTO.fromImages(images);
     }
 
     @Override
-    public Image getImageById(UUID authToken, Long id) {
+    public ImageDTO getImageById(UUID authToken, Long id) {
         User userCurrent = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
+        Image image = imagesRepository.findByImageIdAndUserId(id, userCurrent.getUserId()).orElseThrow(NotFoundException::new);
 
-        return imagesRepository.findByImageIdAndUserId(id, userCurrent.getUserId()).orElseThrow(NotFoundException::new);
+        return new ImageDTO(image);
     }
 
     @Override
-    public Iterable<Image> getImageByKeyword(UUID authToken, String keyword) {
+    public Iterable<ImageDTO> getImageByKeyword(UUID authToken, String keyword) {
         User userCurrent = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
+        Iterable<Image> images = imagesRepository.findByKeywordAndUserId(keyword, userCurrent.getUserId()).orElseThrow(NotFoundException::new);
 
-        return imagesRepository.findByKeywordAndUserId(keyword, userCurrent.getUserId()).orElseThrow(NotFoundException::new);
+        return ImageDTO.fromImages(images);
     }
 
     @Override
-    public @NotNull Image createImage(UUID authToken, @NotNull ImageCreationDTO imageCreation) {
+    public @NotNull ImageDTO createImage(UUID authToken, @NotNull ImageCreationDTO imageCreation) {
         User userCurrent = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
 
         Image image;
@@ -62,7 +66,7 @@ public class ImageServiceImpl implements ImageService {
             throw new IllegalArgumentException(e.getMessage());
         }
 
-        return image;
+        return new ImageDTO(image);
     }
 
     @Override
@@ -73,7 +77,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public @NotNull Image updateImage(UUID authToken, Long id, @NotNull ImageUpdateDTO imageUpdateDTO) {
+    public @NotNull ImageDTO updateImage(UUID authToken, Long id, @NotNull ImageUpdateDTO imageUpdateDTO) {
         Image image = checkImageAccessRights(authToken, id);
 
         if (imageUpdateDTO.getName() != null)
@@ -83,7 +87,7 @@ public class ImageServiceImpl implements ImageService {
         if (imageUpdateDTO.getIsPublic() != null)
             image.setPublic(imageUpdateDTO.getIsPublic());
 
-        return imagesRepository.saveAndFlush(image);
+        return new ImageDTO(imagesRepository.saveAndFlush(image));
     }
 
     @NotNull
