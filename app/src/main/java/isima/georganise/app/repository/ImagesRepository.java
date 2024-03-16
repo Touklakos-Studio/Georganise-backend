@@ -16,6 +16,6 @@ public interface ImagesRepository extends JpaRepository<Image, Long> {
     @Query("SELECT i FROM Image i WHERE i.imageId = :imageId AND (i.userId = :userId OR i.isPublic)")
     Optional<Image> findByImageIdAndUserId(Long imageId, Long userId);
 
-    @Query("SELECT i FROM Image i WHERE i.isPublic")
-    Iterable<Image> findAllPublic();
+    @Query("SELECT i FROM Image i WHERE i.isPublic OR i.userId = :userId")
+    Iterable<Image> findAllPublic(long userId);
 }
