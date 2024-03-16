@@ -4,6 +4,7 @@ import csv
 import math
 import random
 import uuid
+import base64
 
 succes = " created successfully"
 image_path = "Ressources/blobfish.jpg"
@@ -68,7 +69,7 @@ class images:
     
     def generate_data(self):
         with open(path + image_path, "rb") as f:
-            self.image = f.read()
+            self.image = base64.b64encode(f.read()).decode('utf-8')
         self.name = f"Image{self.id}"
         self.description = f"Description{self.id}"
         self.public = random.choice([True, False])

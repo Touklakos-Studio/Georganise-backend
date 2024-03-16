@@ -29,6 +29,4 @@ public interface PlaceService {
     void deletePlace(UUID authToken, Long id);
 
     Place updatePlace(UUID authToken, Long id, PlaceUpdateDTO place);
-
-//    String getPlaceGpx(UUID authToken, Long id);
 }

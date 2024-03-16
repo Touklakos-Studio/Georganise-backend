@@ -196,13 +196,6 @@ public class PlaceServiceImpl implements PlaceService {
         return placesRepository.saveAndFlush(existingPlace);
     }
 
-//    @Override
-//    public String getPlaceGpx(UUID authToken, Long id) {
-//        Place place = checkPlaceAccessRights(authToken, id);
-//
-//        return gpsFormatConverter.toGpx(place);
-//    }
-
     @NotNull
     private Place checkPlaceAccessRights(UUID authToken, @NotNull Long id) {
         User userCurrent = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
