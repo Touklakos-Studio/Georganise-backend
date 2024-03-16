@@ -60,4 +60,10 @@ public class HttpStatusController {
     public void handleMissingRequestCookieError(@NotNull Exception ex) {
         System.err.println(MESSAGE_ERROR + ex.getMessage());
     }
+
+    @ExceptionHandler(ConflictException.class)
+    @ResponseStatus(value = HttpStatus.CONFLICT, reason = "Conflict")
+    public void handleConflictError(@NotNull RuntimeException ex) {
+        System.err.println(MESSAGE_ERROR + ex.getMessage());
+    }
 }

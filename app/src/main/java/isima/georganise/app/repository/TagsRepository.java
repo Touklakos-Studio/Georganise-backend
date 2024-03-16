@@ -12,4 +12,6 @@ public interface TagsRepository extends JpaRepository<Tag, Long> {
 
     @Query("SELECT ta FROM Tag ta JOIN Token to ON ta.tagId=to.tagId WHERE (ta.title LIKE %:keyword% OR ta.description LIKE %:keyword%) AND (ta.userId = :userId OR to.userId = :userId)")
     Optional<Iterable<Tag>> findByKeywordAndUserId(String keyword, Long userId);
+
+    Optional<Tag> findByTitleAndUserId(String title, Long userId);
 }

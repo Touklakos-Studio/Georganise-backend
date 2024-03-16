@@ -6,6 +6,7 @@ import isima.georganise.app.entity.dto.RemovePlaceFromTagDTO;
 import isima.georganise.app.entity.dto.TagCreationDTO;
 import isima.georganise.app.entity.dto.TagUpdateDTO;
 import isima.georganise.app.entity.util.Right;
+import isima.georganise.app.exception.ConflictException;
 import isima.georganise.app.exception.NotFoundException;
 import isima.georganise.app.exception.NotLoggedException;
 import isima.georganise.app.exception.UnauthorizedException;
@@ -17,7 +18,6 @@ import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -90,6 +90,8 @@ public class TagServiceImpl implements TagService {
     @Override
     public @NotNull Tag createTag(UUID authToken, @NotNull TagCreationDTO tag) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
+        if (tagsRepository.findByTitleAndUserId(tag.getTitle(), currentUser.getUserId()).isPresent())
+            throw new ConflictException("Tag with title " + tag.getTitle() + " already exists");
         return tagsRepository.saveAndFlush(new Tag(tag, currentUser.getUserId()));
     }
 
