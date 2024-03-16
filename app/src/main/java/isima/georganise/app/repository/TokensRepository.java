@@ -8,11 +8,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface TokensRepository extends JpaRepository<Token, Long>{
+public interface TokensRepository extends JpaRepository<Token, Long> {
 
     Optional<Iterable<Token>> findByUserId(Long id);
 
-    Optional<Iterable<Token>> findByTagIdAndCreatorId(Long tagId, Long creatorId);
+    Optional<Iterable<Token>> findByCreatorId(Long id);
 
-    Optional<List<Token>> findByUserIdAndTagId(Long userId, Long tagId);
+    List<Token> findByUserIdAndTagId(Long userId, Long tagId);
+
+    List<Token> findByTagId(Long tagId);
 }

@@ -7,9 +7,9 @@ import java.io.Serializable;
 @Data
 public class UserCreationDTO implements Serializable {
 
-        private String nickname;
+    private String nickname;
 
-        private String password;
+    private String password;
 
-        private String email;
+    private String email;
 }

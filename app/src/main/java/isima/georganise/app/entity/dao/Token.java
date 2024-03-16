@@ -1,15 +1,11 @@
 package isima.georganise.app.entity.dao;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import isima.georganise.app.entity.dto.TokenCreationDTO;
 import isima.georganise.app.entity.util.Right;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -40,7 +36,7 @@ public class Token implements Serializable {
     @Column(name = "TAGID", updatable = false, nullable = false)
     private Long tagId;
 
-    public Token(TokenCreationDTO token, Long creatorId) {
+    public Token(@NotNull TokenCreationDTO token, Long creatorId) {
         this.creatorId = creatorId;
         this.tokenValue = UUID.randomUUID();
         this.accessRight = token.getAccessRight();

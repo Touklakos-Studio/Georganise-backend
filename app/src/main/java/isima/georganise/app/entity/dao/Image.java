@@ -4,6 +4,7 @@ import isima.georganise.app.entity.dto.ImageCreationDTO;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -34,7 +35,7 @@ public class Image implements Serializable {
     @Column(name = "PUBLIC", nullable = false)
     private boolean isPublic;
 
-    public Image(ImageCreationDTO imageCreationDTO, Long userId) throws IOException {
+    public Image(@NotNull ImageCreationDTO imageCreationDTO, Long userId) throws IOException {
         this.userId = userId;
         this.imageValue = imageCreationDTO.getImageValue().getBytes();
         this.name = imageCreationDTO.getName();

@@ -1,10 +1,11 @@
 package isima.georganise.app.entity.dao;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import isima.georganise.app.entity.dto.TagCreationDTO;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.List;
@@ -33,7 +34,7 @@ public class Tag implements Serializable {
     @JsonManagedReference
     private List<PlaceTag> placeTags;
 
-    public Tag(TagCreationDTO tag, Long userId) {
+    public Tag(@NotNull TagCreationDTO tag, Long userId) {
         this.title = tag.getTitle();
         this.description = tag.getDescription();
         this.userId = userId;

@@ -1,57 +1,65 @@
 package isima.georganise.app.service.tag;
 
 
-import isima.georganise.app.entity.dao.PlaceTag;
-import isima.georganise.app.entity.dao.Tag;
-import isima.georganise.app.entity.dao.Token;
-import isima.georganise.app.entity.dao.User;
+import isima.georganise.app.entity.dao.*;
+import isima.georganise.app.entity.dto.RemovePlaceFromTagDTO;
 import isima.georganise.app.entity.dto.TagCreationDTO;
 import isima.georganise.app.entity.dto.TagUpdateDTO;
 import isima.georganise.app.entity.util.Right;
 import isima.georganise.app.exception.NotFoundException;
 import isima.georganise.app.exception.NotLoggedException;
 import isima.georganise.app.exception.UnauthorizedException;
-import isima.georganise.app.repository.PlacesRepository;
-import isima.georganise.app.repository.TagsRepository;
-import isima.georganise.app.repository.TokensRepository;
-import isima.georganise.app.repository.UsersRepository;
+import isima.georganise.app.repository.*;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class TagServiceImpl implements TagService{
+public class TagServiceImpl implements TagService {
+
+    private final @NotNull TagsRepository tagsRepository;
+
+    private final @NotNull UsersRepository usersRepository;
+
+    private final @NotNull TokensRepository tokensRepository;
+
+    private final @NotNull PlacesRepository placesRepository;
+
+    private final @NotNull PlacesTagsRepository placesTagsRepository;
 
     @Autowired
-    TagsRepository tagsRepository;
-
-    @Autowired
-    UsersRepository usersRepository;
-
-    @Autowired
-    TokensRepository tokensRepository;
-
-    @Autowired
-    PlacesRepository placesRepository;
+    public TagServiceImpl(@NotNull PlacesRepository placesRepository, @NotNull TagsRepository tagsRepository, @NotNull UsersRepository usersRepository, @NotNull TokensRepository tokensRepository, @NotNull PlacesTagsRepository placesTagsRepository) {
+        Assert.notNull(placesRepository, "placesRepository must not be null");
+        Assert.notNull(tagsRepository, "tagsRepository must not be null");
+        Assert.notNull(usersRepository, "usersRepository must not be null");
+        Assert.notNull(tokensRepository, "tokensRepository must not be null");
+        Assert.notNull(placesTagsRepository, "placesTagsRepository must not be null");
+        this.placesRepository = placesRepository;
+        this.tagsRepository = tagsRepository;
+        this.usersRepository = usersRepository;
+        this.tokensRepository = tokensRepository;
+        this.placesTagsRepository = placesTagsRepository;
+    }
 
     @Override
-    public List<Tag> getAllTags(UUID authToken) {
+    public @NotNull List<Tag> getAllTags(UUID authToken) {
         usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
 
         return tagsRepository.findAll();
     }
 
     @Override
-    public Tag getTagById(UUID authToken, Long id) {
+    public @NotNull Tag getTagById(UUID authToken, @NotNull Long id) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
         Tag tag = tagsRepository.findById(id).orElseThrow(NotFoundException::new);
 
-        if (!currentUser.getUserId().equals(tag.getUserId()))
-            tokensRepository.findByUserIdAndTagId(currentUser.getUserId(), id).orElseThrow(NotFoundException::new);
+        if (!currentUser.getUserId().equals(tag.getUserId()) && (tokensRepository.findByUserIdAndTagId(currentUser.getUserId(), id).isEmpty()))
+            throw new UnauthorizedException(currentUser.getNickname(), "get tag of user " + tag.getUserId());
 
         return tag;
     }
@@ -64,35 +72,27 @@ public class TagServiceImpl implements TagService{
     }
 
     @Override
-    public Tag createTag(UUID authToken, TagCreationDTO tag) {
+    public @NotNull Tag createTag(UUID authToken, @NotNull TagCreationDTO tag) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
         return tagsRepository.saveAndFlush(new Tag(tag, currentUser.getUserId()));
     }
 
     @Override
-    public void deleteTag(UUID authToken, Long id) {
+    public void deleteTag(UUID authToken, @NotNull Long id) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
-        Tag tag = tagsRepository.findById(id).orElseThrow(NotFoundException::new);
+        Tag tag = checkTagAccessRight(id, currentUser, "delete tag of user ");
 
-        if (!currentUser.getUserId().equals(tag.getUserId())) {
-            List<Token> token = tokensRepository.findByUserIdAndTagId(currentUser.getUserId(), id).orElseThrow(UnauthorizedException::new);
-            if (token.stream().noneMatch(t -> t.getAccessRight().equals(Right.WRITER)))
-                throw new UnauthorizedException(currentUser.getNickname(), "delete tag of user " + tag.getUserId());
-        }
+        placesTagsRepository.deleteAll(placesTagsRepository.findByTag_TagId(id));
+
+        tokensRepository.deleteAll(tokensRepository.findByTagId(id));
 
         tagsRepository.delete(tag);
     }
 
     @Override
-    public Tag updateTag(UUID authToken, Long id, TagUpdateDTO tag) {
+    public @NotNull Tag updateTag(UUID authToken, @NotNull Long id, @NotNull TagUpdateDTO tag) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
-        Tag tagToUpdate = tagsRepository.findById(id).orElseThrow(NotFoundException::new);
-
-        if (!currentUser.getUserId().equals(tagToUpdate.getUserId())) {
-            List<Token> token = tokensRepository.findByUserIdAndTagId(currentUser.getUserId(), id).orElseThrow(UnauthorizedException::new);
-            if (token.stream().noneMatch(t -> t.getAccessRight().equals(Right.WRITER)))
-                throw new UnauthorizedException(currentUser.getNickname(), "update tag of user " + tagToUpdate.getUserId());
-        }
+        Tag tagToUpdate = checkTagAccessRight(id, currentUser, "update tag of user ");
 
         if (tag.getTitle() != null) {
             tagToUpdate.setTitle(tag.getTitle());
@@ -103,12 +103,37 @@ public class TagServiceImpl implements TagService{
         if (tag.getPlaceIds() != null) {
             List<PlaceTag> placeTag = new ArrayList<>();
             for (Long placeId : tag.getPlaceIds()) {
-                placeTag.add(new PlaceTag(placesRepository.findById(placeId).orElseThrow(NotFoundException::new), tagToUpdate));
+                Place place = placesRepository.findByPlaceIdAndUserId(placeId, currentUser.getUserId());
+                if (place == null)
+                    throw new UnauthorizedException(currentUser.getNickname(), "update tag with place of user " + placeId);
+                placeTag.add(new PlaceTag(place, tagToUpdate));
             }
+            placesTagsRepository.saveAllAndFlush(placeTag);
             tagToUpdate.setPlaceTags(placeTag);
         }
 
         return tagsRepository.saveAndFlush(tagToUpdate);
+    }
+
+    @Override
+    public void removePlaceFromTag(UUID authToken, @NotNull Long id, @NotNull RemovePlaceFromTagDTO placeId) {
+        User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
+        checkTagAccessRight(id, currentUser, "remove place from tag of user ");
+
+        PlaceTag placeTag = placesTagsRepository.findByTag_TagIdAndPlace_PlaceId(id, placeId.getPlaceId()).orElseThrow(NotFoundException::new);
+        placesTagsRepository.delete(placeTag);
+    }
+
+    @NotNull
+    private Tag checkTagAccessRight(@NotNull Long id, User currentUser, String x) {
+        Tag tagToUpdate = tagsRepository.findById(id).orElseThrow(NotFoundException::new);
+
+        if (!currentUser.getUserId().equals(tagToUpdate.getUserId())) {
+            List<Token> token = tokensRepository.findByUserIdAndTagId(currentUser.getUserId(), id);
+            if (token.stream().noneMatch(t -> t.getAccessRight().equals(Right.WRITER)))
+                throw new UnauthorizedException(currentUser.getNickname(), x + tagToUpdate.getUserId());
+        }
+        return tagToUpdate;
     }
 }
 

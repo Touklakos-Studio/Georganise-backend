@@ -12,37 +12,45 @@ import isima.georganise.app.exception.UnauthorizedException;
 import isima.georganise.app.repository.TagsRepository;
 import isima.georganise.app.repository.TokensRepository;
 import isima.georganise.app.repository.UsersRepository;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class TokenServiceImpl implements TokenService{
+public class TokenServiceImpl implements TokenService {
+
+    private final @NotNull TokensRepository tokensRepository;
+
+    private final @NotNull UsersRepository usersRepository;
+
+    private final @NotNull TagsRepository tagsRepository;
 
     @Autowired
-    TokensRepository tokensRepository;
-
-    @Autowired
-    UsersRepository usersRepository;
-
-    @Autowired
-    TagsRepository tagsRepository;
+    public TokenServiceImpl(@NotNull UsersRepository usersRepository, @NotNull TokensRepository tokensRepository, @NotNull TagsRepository tagsRepository) {
+        Assert.notNull(tokensRepository, "Tokens repository must not be null");
+        Assert.notNull(usersRepository, "Users repository must not be null");
+        Assert.notNull(tagsRepository, "Tags repository must not be null");
+        this.usersRepository = usersRepository;
+        this.tokensRepository = tokensRepository;
+        this.tagsRepository = tagsRepository;
+    }
 
     @Override
-    public List<Token> getAllTokens(UUID authToken) {
+    public @NotNull List<Token> getAllTokens(UUID authToken) {
         usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
 
         return tokensRepository.findAll();
     }
 
     @Override
-    public Token getTokenById(UUID authToken, Long id) {
+    public @NotNull Token getTokenById(UUID authToken, @NotNull Long id) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
-        Token token =  tokensRepository.findById(id).orElseThrow(NotFoundException::new);
+        Token token = tokensRepository.findById(id).orElseThrow(NotFoundException::new);
 
         if (!token.getUserId().equals(currentUser.getUserId()))
             throw new NotFoundException("Token not found");
@@ -51,24 +59,18 @@ public class TokenServiceImpl implements TokenService{
     }
 
     @Override
-    public Iterable<Token> getTokensByUser(UUID authToken, Long id) {
+    public @NotNull Iterable<Token> getTokensByTag(UUID authToken, Long id) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
+        List<Token> tokens = tokensRepository.findByUserIdAndTagId(currentUser.getUserId(), id);
 
-        if (!currentUser.getUserId().equals(id))
-            throw new UnauthorizedException(currentUser.getNickname(), "get tokens of user " + id);
+        if (tokens.isEmpty())
+            throw new NotFoundException("No tokens found for tag " + id);
 
-        return tokensRepository.findByUserId(id).orElseThrow(NotFoundException::new);
+        return tokens;
     }
 
     @Override
-    public Iterable<Token> getTokensByTag(UUID authToken, Long id) {
-        User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
-
-        return tokensRepository.findByTagIdAndCreatorId(id, currentUser.getUserId()).orElseThrow(NotFoundException::new);
-    }
-
-    @Override
-    public Token createToken(UUID authToken, TokenCreationDTO token) {
+    public @NotNull Token createToken(UUID authToken, @NotNull TokenCreationDTO token) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
 
         if (Objects.isNull(token.getAccessRight()))
@@ -85,7 +87,7 @@ public class TokenServiceImpl implements TokenService{
     }
 
     @Override
-    public void deleteToken(UUID authToken, Long id) {
+    public void deleteToken(UUID authToken, @NotNull Long id) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
         Token token = tokensRepository.findById(id).orElseThrow(NotFoundException::new);
 
@@ -96,7 +98,7 @@ public class TokenServiceImpl implements TokenService{
     }
 
     @Override
-    public Token updateToken(UUID authToken, Long id, TokenUpdateDTO token) {
+    public @NotNull Token updateToken(UUID authToken, @NotNull Long id, @NotNull TokenUpdateDTO token) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
         Token tokenToUpdate = tokensRepository.findById(id).orElseThrow(NotFoundException::new);
 
@@ -105,14 +107,12 @@ public class TokenServiceImpl implements TokenService{
 
         if (token.getAccessRight() != null)
             tokenToUpdate.setAccessRight(token.getAccessRight());
-        if (token.getUserId() != null)
-            tokenToUpdate.setUserId(token.getUserId());
 
         return tokensRepository.saveAndFlush(tokenToUpdate);
     }
 
     @Override
-    public Token addTokenToUser(UUID authToken, Long id) {
+    public @NotNull Token addTokenToUser(UUID authToken, @NotNull Long id) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
         Token tokenToUpdate = tokensRepository.findById(id).orElseThrow(NotFoundException::new);
 
@@ -122,6 +122,26 @@ public class TokenServiceImpl implements TokenService{
         tokenToUpdate.setUserId(currentUser.getUserId());
 
         return tokensRepository.saveAndFlush(tokenToUpdate);
+    }
+
+    @Override
+    public @NotNull Iterable<Token> getTokensByUser(UUID authToken, Long id, boolean isCreator) {
+        User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
+
+        if (!currentUser.getUserId().equals(id))
+            throw new UnauthorizedException(currentUser.getNickname(), "get tokens of user " + id);
+
+        Iterable<Token> tokens;
+        if (isCreator) {
+            tokens = tokensRepository.findByCreatorId(id).orElseThrow(NotFoundException::new);
+        } else {
+            tokens = tokensRepository.findByUserId(id).orElseThrow(NotFoundException::new);
+        }
+
+        if (!tokens.iterator().hasNext())
+            throw new NotFoundException("No tokens found for user " + id);
+
+        return tokens;
     }
 }
 

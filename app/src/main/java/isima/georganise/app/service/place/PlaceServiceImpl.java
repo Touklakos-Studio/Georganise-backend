@@ -1,15 +1,20 @@
 package isima.georganise.app.service.place;
 
 
-import isima.georganise.app.entity.dao.*;
+import isima.georganise.app.entity.dao.Place;
+import isima.georganise.app.entity.dao.PlaceTag;
+import isima.georganise.app.entity.dao.Tag;
+import isima.georganise.app.entity.dao.User;
 import isima.georganise.app.entity.dto.GetPlaceVicinityDTO;
 import isima.georganise.app.entity.dto.PlaceCreationDTO;
 import isima.georganise.app.entity.dto.PlaceUpdateDTO;
 import isima.georganise.app.exception.NotFoundException;
 import isima.georganise.app.exception.NotLoggedException;
 import isima.georganise.app.repository.*;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -17,34 +22,52 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class PlaceServiceImpl implements PlaceService{
+public class PlaceServiceImpl implements PlaceService {
+
+    private final @NotNull PlacesRepository placesRepository;
+
+    private final @NotNull TokensRepository tokensRepository;
+
+    private final @NotNull UsersRepository usersRepository;
+
+    private final @NotNull TagsRepository tagsRepository;
+
+    private final @NotNull PlacesTagsRepository placesTagsRepository;
 
     @Autowired
-    PlacesRepository placesRepository;
-
-    @Autowired
-    TokensRepository tokensRepository;
-
-    @Autowired
-    UsersRepository usersRepository;
-
-    @Autowired
-    TagsRepository tagsRepository;
+    public PlaceServiceImpl(@NotNull TagsRepository tagsRepository, @NotNull PlacesRepository placesRepository, @NotNull TokensRepository tokensRepository, @NotNull UsersRepository usersRepository, @NotNull PlacesTagsRepository placesTagsRepository) {
+        Assert.notNull(tagsRepository, "TagsRepository cannot be null");
+        Assert.notNull(placesRepository, "PlacesRepository cannot be null");
+        Assert.notNull(tokensRepository, "TokensRepository cannot be null");
+        Assert.notNull(usersRepository, "UsersRepository cannot be null");
+        Assert.notNull(placesTagsRepository, "PlacesTagsRepository cannot be null");
+        this.tagsRepository = tagsRepository;
+        this.placesRepository = placesRepository;
+        this.tokensRepository = tokensRepository;
+        this.usersRepository = usersRepository;
+        this.placesTagsRepository = placesTagsRepository;
+    }
 
     @Override
-    public List<Place> getAllPlaces(UUID authToken) {
+    public @NotNull List<Place> getAllPlaces(UUID authToken) {
         usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
 
         return placesRepository.findAll();
     }
 
     @Override
-    public Place getPlaceById(UUID authToken, Long id) {
+    public @NotNull Place getPlaceById(UUID authToken, @NotNull Long id) {
         User userCurrent = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
         Place place = placesRepository.findById(id).orElseThrow(NotFoundException::new);
 
         if (!userCurrent.getUserId().equals(place.getUserId())) {
-            place.getPlaceTags().forEach(placeTag -> tokensRepository.findByUserIdAndTagId(userCurrent.getUserId(), placeTag.getTag().getTagId()).orElseThrow(NotFoundException::new));
+            List<Tag> tags = place.getPlaceTags().stream().map(PlaceTag::getTag).toList();
+            if (tags.isEmpty())
+                throw new NotFoundException("User " + userCurrent.getUserId() + " has no access to this place.");
+            tags.forEach(tag -> {
+                if (tokensRepository.findByUserIdAndTagId(userCurrent.getUserId(), tag.getTagId()).isEmpty())
+                    throw new NotFoundException("User " + userCurrent.getUserId() + " has no access token to this place.");
+            });
         }
 
         return place;
@@ -52,31 +75,48 @@ public class PlaceServiceImpl implements PlaceService{
 
 
     @Override
-    public List<Place> getPlacesByUser(UUID authToken, Long id) {
+    public @NotNull List<Place> getPlacesByUser(UUID authToken, Long id) {
         User userCurrent = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
 
         if (!userCurrent.getUserId().equals(id))
-            throw new NotFoundException();
+            throw new NotFoundException("User " + userCurrent.getUserId() + " has no access to this user's places.");
 
-        return placesRepository.findByUserId(id).orElseThrow(NotFoundException::new);
+        List<Place> places = placesRepository.findByUserId(id);
+
+        if (places.isEmpty()) throw new NotFoundException("User " + userCurrent.getUserId() + " has no places.");
+
+        return places;
     }
 
     @Override
-    public List<Place> getPlacesByTag(UUID authToken, Long id) {
+    public @NotNull List<Place> getPlacesByTag(UUID authToken, @NotNull Long id) {
         User userCurrent = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
+        Tag tag = tagsRepository.findById(id).orElseThrow(NotFoundException::new);
 
-        return placesRepository.findByTagIdAndUserId(id, userCurrent.getUserId()).orElseThrow(NotFoundException::new);
+        if (!tag.getUserId().equals(userCurrent.getUserId()) && (tokensRepository.findByUserIdAndTagId(userCurrent.getUserId(), tag.getTagId()).isEmpty()))
+            throw new NotFoundException("User " + userCurrent.getUserId() + " has no access token to this tag.");
+
+        List<Place> places = placesRepository.findByTagId(id);
+
+        if (places.isEmpty())
+            throw new NotFoundException("User " + userCurrent.getUserId() + " has no places with tag " + id + ".");
+
+        return places;
     }
 
     @Override
-    public List<Place> getPlacesByKeyword(UUID authToken, String keyword) {
+    public @NotNull List<Place> getPlacesByKeyword(UUID authToken, String keyword) {
         User userCurrent = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
+        List<Place> places = placesRepository.findByKeywordAndUserID(keyword, userCurrent.getUserId());
 
-        return placesRepository.findByKeywordAndUserId(keyword, userCurrent.getUserId()).orElseThrow(NotFoundException::new);
+        if (places.isEmpty())
+            throw new NotFoundException("User " + userCurrent.getUserId() + " has no places with keyword " + keyword + ".");
+
+        return places;
     }
 
     @Override
-    public List<Place> getPlacesByVicinity(UUID authToken, GetPlaceVicinityDTO dto) {
+    public @NotNull List<Place> getPlacesByVicinity(UUID authToken, @NotNull GetPlaceVicinityDTO dto) {
         User userCurrent = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
 
         BigDecimal minLongitude = dto.getLongitude().subtract(dto.getRadius());
@@ -84,55 +124,81 @@ public class PlaceServiceImpl implements PlaceService{
         BigDecimal minLatitude = dto.getLatitude().subtract(dto.getRadius());
         BigDecimal maxLatitude = dto.getLatitude().add(dto.getRadius());
 
-        return placesRepository.findByVicinityAndUserId(minLongitude, maxLongitude, minLatitude, maxLatitude, userCurrent.getUserId()).orElseThrow(NotFoundException::new);
+        List<Place> places = placesRepository.findByVicinityAndUserId(minLongitude, maxLongitude, minLatitude, maxLatitude, userCurrent.getUserId()).orElse(new ArrayList<>());
+
+        if (places.isEmpty())
+            throw new NotFoundException("User " + userCurrent.getUserId() + " has no places in vicinity " + dto + ".");
+
+        return places;
     }
 
     @Override
-    public Place createPlace(UUID authToken, PlaceCreationDTO placeCreationDTO) {
+    public @NotNull Place createPlace(UUID authToken, @NotNull PlaceCreationDTO placeCreationDTO) {
         User userCurrent = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
+        Place place = new Place(placeCreationDTO, userCurrent.getUserId());
 
-        return placesRepository.saveAndFlush(new Place(placeCreationDTO, userCurrent.getUserId()));
+        List<Tag> tags = tagsRepository.findAllById(placeCreationDTO.getTagIds());
+        List<PlaceTag> placeTags = new ArrayList<>();
+        for (Tag tag : tags) {
+            if (!tag.getUserId().equals(userCurrent.getUserId()) && tokensRepository.findByUserIdAndTagId(userCurrent.getUserId(), tag.getTagId()).isEmpty())
+                throw new NotFoundException("User " + userCurrent.getUserId() + " has no access token to tag " + tag.getTagId() + ".");
+            placeTags.add(new PlaceTag(place, tag));
+        }
+        placesRepository.saveAndFlush(place);
+
+        place.setPlaceTags(placeTags);
+
+        placesTagsRepository.saveAllAndFlush(placeTags);
+
+        return place;
     }
 
     @Override
-    public void deletePlace(UUID authToken, Long id) {
-        User userCurrent = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
-        Place place = placesRepository.findById(id).orElseThrow(NotFoundException::new);
+    public void deletePlace(UUID authToken, @NotNull Long id) {
+        Place place = checkPlaceAccessRights(authToken, id);
 
-        if (!userCurrent.getUserId().equals(place.getUserId()))
-            throw new NotFoundException();
+        placesTagsRepository.deleteAll(place.getPlaceTags());
 
         placesRepository.delete(place);
     }
 
     @Override
-    public Place updatePlace(UUID authToken, Long id, PlaceUpdateDTO place) {
+    public @NotNull Place updatePlace(UUID authToken, @NotNull Long id, @NotNull PlaceUpdateDTO place) {
+        Place existingPlace = checkPlaceAccessRights(authToken, id);
+
+        if (place.getName() != null)
+            existingPlace.setName(place.getName());
+        if (place.getDescription() != null)
+            existingPlace.setDescription(place.getDescription());
+        if (place.getLongitude() != null)
+            existingPlace.setLongitude(place.getLongitude());
+        if (place.getLatitude() != null)
+            existingPlace.setLatitude(place.getLatitude());
+        if (place.getImageId() != null)
+            existingPlace.setImageId(place.getImageId());
+        List<PlaceTag> placeTags = new ArrayList<>();
+        if (place.getTagIds() != null) {
+            for (Long tagId : place.getTagIds()) {
+                if (existingPlace.getPlaceTags().stream().noneMatch(placeTag -> placeTag.getTag().getTagId().equals(tagId))) {
+                    Tag tag = tagsRepository.findById(tagId).orElseThrow(NotFoundException::new);
+                    placeTags.add(new PlaceTag(existingPlace, tag));
+                }
+            }
+        }
+        placesTagsRepository.saveAllAndFlush(placeTags);
+        existingPlace.getPlaceTags().addAll(placeTags);
+
+        return placesRepository.saveAndFlush(existingPlace);
+    }
+
+    @NotNull
+    private Place checkPlaceAccessRights(UUID authToken, @NotNull Long id) {
         User userCurrent = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
         Place existingPlace = placesRepository.findById(id).orElseThrow(NotFoundException::new);
 
         if (!userCurrent.getUserId().equals(existingPlace.getUserId()))
             throw new NotFoundException();
-
-        if(place.getName() != null)
-            existingPlace.setName(place.getName());
-        if(place.getDescription() != null)
-            existingPlace.setDescription(place.getDescription());
-        if(place.getLongitude() != null)
-            existingPlace.setLongitude(place.getLongitude());
-        if(place.getLatitude() != null)
-            existingPlace.setLatitude(place.getLatitude());
-        if(place.getImageId() != null)
-            existingPlace.setImageId(place.getImageId());
-        if(place.getTagIds() != null) {
-            for (Long tagId : place.getTagIds()) {
-                if (existingPlace.getPlaceTags().stream().noneMatch(placeTag -> placeTag.getTag().getTagId().equals(tagId))) {
-                    Tag tag = tagsRepository.findById(tagId).orElseThrow(NotFoundException::new);
-                    existingPlace.getPlaceTags().add(new PlaceTag(existingPlace, tag));
-                }
-            }
-        }
-
-        return placesRepository.saveAndFlush(existingPlace);
+        return existingPlace;
     }
 }
 

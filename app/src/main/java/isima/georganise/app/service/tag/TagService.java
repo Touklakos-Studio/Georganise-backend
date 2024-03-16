@@ -1,6 +1,7 @@
 package isima.georganise.app.service.tag;
 
 import isima.georganise.app.entity.dao.Tag;
+import isima.georganise.app.entity.dto.RemovePlaceFromTagDTO;
 import isima.georganise.app.entity.dto.TagCreationDTO;
 import isima.georganise.app.entity.dto.TagUpdateDTO;
 import org.springframework.stereotype.Service;
@@ -11,16 +12,17 @@ import java.util.UUID;
 @Service
 public interface TagService {
 
-    public List<Tag> getAllTags(UUID authToken);
+    List<Tag> getAllTags(UUID authToken);
 
-    public Tag getTagById(UUID authToken, Long id);
+    Tag getTagById(UUID authToken, Long id);
 
-    public Iterable<Tag> getTagsByKeyword(UUID authToken, String keyword);
+    Iterable<Tag> getTagsByKeyword(UUID authToken, String keyword);
 
-    public Tag createTag(UUID authToken, TagCreationDTO tag);
+    Tag createTag(UUID authToken, TagCreationDTO tag);
 
-    public void deleteTag(UUID authToken, Long id);
+    void deleteTag(UUID authToken, Long id);
 
-    public Tag updateTag(UUID authToken, Long id, TagUpdateDTO tag);
+    Tag updateTag(UUID authToken, Long id, TagUpdateDTO tag);
 
+    void removePlaceFromTag(UUID authToken, Long id, RemovePlaceFromTagDTO placeId);
 }

@@ -1,10 +1,11 @@
 package isima.georganise.app.entity.dao;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import isima.georganise.app.entity.dto.PlaceCreationDTO;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -43,7 +44,7 @@ public class Place implements Serializable {
     @JsonManagedReference
     private List<PlaceTag> placeTags;
 
-    public Place(PlaceCreationDTO placeCreationDTO, Long userId) {
+    public Place(@NotNull PlaceCreationDTO placeCreationDTO, Long userId) {
         this.latitude = placeCreationDTO.getLatitude();
         this.longitude = placeCreationDTO.getLongitude();
         this.name = placeCreationDTO.getName();
