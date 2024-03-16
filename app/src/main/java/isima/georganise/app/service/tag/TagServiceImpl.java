@@ -17,6 +17,7 @@ import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -48,9 +49,24 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public @NotNull List<Tag> getAllTags(UUID authToken) {
-        usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
+        User userCurrent = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
 
-        return tagsRepository.findAll();
+        List<Tag> tags = tagsRepository.findAll();
+
+        if (tags.isEmpty()) throw new NotFoundException();
+
+        List<Tag> tagsToReturn = new ArrayList<>();
+        for (Tag tag : tags) {
+            if (tag.getUserId().equals(userCurrent.getUserId())) {
+                tagsToReturn.add(tag);
+            } else {
+                List<Token> tokens = tokensRepository.findByUserIdAndTagId(userCurrent.getUserId(), tag.getTagId());
+                if (!tokens.isEmpty())
+                    tagsToReturn.add(tag);
+            }
+        }
+
+        return tagsToReturn;
     }
 
     @Override
