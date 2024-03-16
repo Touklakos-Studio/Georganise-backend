@@ -5,10 +5,7 @@ import isima.georganise.app.entity.dao.User;
 import isima.georganise.app.entity.dto.UserCreationDTO;
 import isima.georganise.app.entity.dto.UserLoginDTO;
 import isima.georganise.app.entity.dto.UserUpdateDTO;
-import isima.georganise.app.exception.NotFoundException;
-import isima.georganise.app.exception.NotLoggedException;
-import isima.georganise.app.exception.UnauthorizedException;
-import isima.georganise.app.exception.WrongPasswordException;
+import isima.georganise.app.exception.*;
 import isima.georganise.app.repository.UsersRepository;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -42,6 +39,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UUID createUser(@NotNull UserCreationDTO user) {
+        if (usersRepository.findByEmail(user.getEmail()).isPresent())
+            throw new ConflictException("User with email: " + user.getEmail() + " already exists");
+        if (usersRepository.findByNickname(user.getNickname()).isPresent())
+            throw new ConflictException("User with nickname: " + user.getNickname() + " already exists");
+
         return usersRepository.saveAndFlush(new User(user)).getAuthToken();
     }
 
