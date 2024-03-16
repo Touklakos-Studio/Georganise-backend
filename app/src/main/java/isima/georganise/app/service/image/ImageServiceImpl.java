@@ -32,9 +32,9 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public Iterable<Image> getAllImages(UUID authToken) {
-        usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
+        User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
 
-        return imagesRepository.findAllPublic();
+        return imagesRepository.findAllPublic(currentUser.getUserId());
     }
 
     @Override
