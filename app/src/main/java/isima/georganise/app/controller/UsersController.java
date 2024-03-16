@@ -1,6 +1,7 @@
 package isima.georganise.app.controller;
 
 import isima.georganise.app.entity.dao.User;
+import isima.georganise.app.entity.dto.GetUserNicknameDTO;
 import isima.georganise.app.entity.dto.UserCreationDTO;
 import isima.georganise.app.entity.dto.UserLoginDTO;
 import isima.georganise.app.entity.dto.UserUpdateDTO;
@@ -32,7 +33,7 @@ public class UsersController {
     }
 
     @GetMapping(path = "/{id}", produces = "application/json")
-    public @NotNull ResponseEntity<User> getUserById(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @PathVariable("id") Long id) {
+    public @NotNull ResponseEntity<GetUserNicknameDTO> getUserById(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @PathVariable("id") Long id) {
         return ResponseEntity.ok(userService.getUserById(authToken, id));
     }
 

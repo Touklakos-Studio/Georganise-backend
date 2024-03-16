@@ -2,6 +2,7 @@ package isima.georganise.app.service.user;
 
 
 import isima.georganise.app.entity.dao.User;
+import isima.georganise.app.entity.dto.GetUserNicknameDTO;
 import isima.georganise.app.entity.dto.UserCreationDTO;
 import isima.georganise.app.entity.dto.UserLoginDTO;
 import isima.georganise.app.entity.dto.UserUpdateDTO;
@@ -31,10 +32,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserById(UUID authToken, @NotNull Long id) {
+    public GetUserNicknameDTO getUserById(UUID authToken, @NotNull Long id) {
         usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
 
-        return usersRepository.findById(id).orElseThrow(NotFoundException::new);
+        GetUserNicknameDTO dto = new GetUserNicknameDTO();
+        dto.setNickname(usersRepository.findById(id).orElseThrow(NotFoundException::new).getNickname());
+
+        return dto;
     }
 
     @Override

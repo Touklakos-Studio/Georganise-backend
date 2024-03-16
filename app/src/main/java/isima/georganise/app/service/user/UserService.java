@@ -1,6 +1,7 @@
 package isima.georganise.app.service.user;
 
 import isima.georganise.app.entity.dao.User;
+import isima.georganise.app.entity.dto.GetUserNicknameDTO;
 import isima.georganise.app.entity.dto.UserCreationDTO;
 import isima.georganise.app.entity.dto.UserLoginDTO;
 import isima.georganise.app.entity.dto.UserUpdateDTO;
@@ -14,7 +15,7 @@ public interface UserService {
 
     List<User> getAllUsers(UUID authToken);
 
-    User getUserById(UUID authToken, Long id);
+    GetUserNicknameDTO getUserById(UUID authToken, Long id);
 
     UUID createUser(UserCreationDTO user);
 
