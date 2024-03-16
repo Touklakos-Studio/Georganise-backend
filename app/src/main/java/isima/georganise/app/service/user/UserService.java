@@ -25,4 +25,6 @@ public interface UserService {
     UUID login(UserLoginDTO user);
 
     void logout(UUID authToken);
+
+    User getMe(UUID authToken);
 }
