@@ -11,6 +11,7 @@ import isima.georganise.app.entity.dto.PlaceUpdateDTO;
 import isima.georganise.app.exception.NotFoundException;
 import isima.georganise.app.exception.NotLoggedException;
 import isima.georganise.app.repository.*;
+import isima.georganise.app.service.util.GpsFormatConverter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,18 +35,22 @@ public class PlaceServiceImpl implements PlaceService {
 
     private final @NotNull PlacesTagsRepository placesTagsRepository;
 
+    private final @NotNull GpsFormatConverter gpsFormatConverter;
+
     @Autowired
-    public PlaceServiceImpl(@NotNull TagsRepository tagsRepository, @NotNull PlacesRepository placesRepository, @NotNull TokensRepository tokensRepository, @NotNull UsersRepository usersRepository, @NotNull PlacesTagsRepository placesTagsRepository) {
+    public PlaceServiceImpl(@NotNull TagsRepository tagsRepository, @NotNull PlacesRepository placesRepository, @NotNull TokensRepository tokensRepository, @NotNull UsersRepository usersRepository, @NotNull PlacesTagsRepository placesTagsRepository, @NotNull GpsFormatConverter gpsFormatConverter) {
         Assert.notNull(tagsRepository, "TagsRepository cannot be null");
         Assert.notNull(placesRepository, "PlacesRepository cannot be null");
         Assert.notNull(tokensRepository, "TokensRepository cannot be null");
         Assert.notNull(usersRepository, "UsersRepository cannot be null");
         Assert.notNull(placesTagsRepository, "PlacesTagsRepository cannot be null");
+        Assert.notNull(gpsFormatConverter, "GpsFormatConverter cannot be null");
         this.tagsRepository = tagsRepository;
         this.placesRepository = placesRepository;
         this.tokensRepository = tokensRepository;
         this.usersRepository = usersRepository;
         this.placesTagsRepository = placesTagsRepository;
+        this.gpsFormatConverter = gpsFormatConverter;
     }
 
     @Override
@@ -190,6 +195,13 @@ public class PlaceServiceImpl implements PlaceService {
 
         return placesRepository.saveAndFlush(existingPlace);
     }
+
+//    @Override
+//    public String getPlaceGpx(UUID authToken, Long id) {
+//        Place place = checkPlaceAccessRights(authToken, id);
+//
+//        return gpsFormatConverter.toGpx(place);
+//    }
 
     @NotNull
     private Place checkPlaceAccessRights(UUID authToken, @NotNull Long id) {

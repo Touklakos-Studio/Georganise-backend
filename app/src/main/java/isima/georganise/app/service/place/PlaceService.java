@@ -30,4 +30,5 @@ public interface PlaceService {
 
     Place updatePlace(UUID authToken, Long id, PlaceUpdateDTO place);
 
+//    String getPlaceGpx(UUID authToken, Long id);
 }
