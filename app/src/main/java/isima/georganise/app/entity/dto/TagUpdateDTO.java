@@ -8,9 +8,9 @@ import java.util.List;
 @Data
 public class TagUpdateDTO implements Serializable {
 
-        private String title;
+    private String title;
 
-        private String description;
+    private String description;
 
-        private List<Long> placeIds;
+    private List<Long> placeIds;
 }

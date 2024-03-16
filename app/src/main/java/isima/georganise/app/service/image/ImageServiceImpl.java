@@ -8,19 +8,27 @@ import isima.georganise.app.exception.NotFoundException;
 import isima.georganise.app.exception.NotLoggedException;
 import isima.georganise.app.repository.ImagesRepository;
 import isima.georganise.app.repository.UsersRepository;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.util.UUID;
 
 @Service
-public class ImageServiceImpl implements ImageService{
+public class ImageServiceImpl implements ImageService {
+
+    private final @NotNull ImagesRepository imagesRepository;
+
+    private final @NotNull UsersRepository usersRepository;
 
     @Autowired
-    ImagesRepository imagesRepository;
-
-    @Autowired
-    UsersRepository usersRepository;
+    public ImageServiceImpl(@NotNull ImagesRepository imagesRepository, @NotNull UsersRepository usersRepository) {
+        Assert.notNull(imagesRepository, "ImagesRepository cannot be null");
+        Assert.notNull(usersRepository, "UsersRepository cannot be null");
+        this.imagesRepository = imagesRepository;
+        this.usersRepository = usersRepository;
+    }
 
     @Override
     public Iterable<Image> getAllImages(UUID authToken) {
@@ -44,7 +52,7 @@ public class ImageServiceImpl implements ImageService{
     }
 
     @Override
-    public Image createImage(UUID authToken, ImageCreationDTO imageCreation) {
+    public @NotNull Image createImage(UUID authToken, @NotNull ImageCreationDTO imageCreation) {
         User userCurrent = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
 
         Image image;
@@ -59,31 +67,33 @@ public class ImageServiceImpl implements ImageService{
 
     @Override
     public void deleteImage(UUID authToken, Long id) {
-        User userCurrent = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
-        Image image = imagesRepository.findByImageIdAndUserId(id, userCurrent.getUserId()).orElseThrow(NotFoundException::new);
-
-        if (!image.getUserId().equals(userCurrent.getUserId()))
-            throw new NotFoundException();
+        Image image = checkImageAccessRights(authToken, id);
 
         imagesRepository.delete(image);
     }
 
     @Override
-    public Image updateImage(UUID authToken, Long id, ImageUpdateDTO imageUpdateDTO) {
+    public @NotNull Image updateImage(UUID authToken, Long id, @NotNull ImageUpdateDTO imageUpdateDTO) {
+        Image image = checkImageAccessRights(authToken, id);
+
+        if (imageUpdateDTO.getName() != null)
+            image.setName(imageUpdateDTO.getName());
+        if (imageUpdateDTO.getDescription() != null)
+            image.setDescription(imageUpdateDTO.getDescription());
+        if (imageUpdateDTO.getIsPublic() != null)
+            image.setPublic(imageUpdateDTO.getIsPublic());
+
+        return imagesRepository.saveAndFlush(image);
+    }
+
+    @NotNull
+    private Image checkImageAccessRights(UUID authToken, Long id) {
         User userCurrent = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
         Image image = imagesRepository.findByImageIdAndUserId(id, userCurrent.getUserId()).orElseThrow(NotFoundException::new);
 
         if (!image.getUserId().equals(userCurrent.getUserId()))
             throw new NotFoundException();
-
-        if(imageUpdateDTO.getName() != null)
-            image.setName(imageUpdateDTO.getName());
-        if(imageUpdateDTO.getDescription() != null)
-            image.setDescription(imageUpdateDTO.getDescription());
-        if(imageUpdateDTO.getIsPublic() != null)
-            image.setPublic(imageUpdateDTO.getIsPublic());
-
-        return imagesRepository.saveAndFlush(image);
+        return image;
     }
 }
 

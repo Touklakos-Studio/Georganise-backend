@@ -12,15 +12,17 @@ import java.util.Optional;
 @Repository
 public interface PlacesRepository extends JpaRepository<Place, Long> {
 
-    Optional<List<Place>> findByUserId(Long id);
+    List<Place> findByUserId(Long id);
 
-    @Query("SELECT p FROM Place p JOIN PlaceTag pt WHERE pt.tag.tagId = :tagId AND p.userId = :userId")
-    Optional<List<Place>> findByTagIdAndUserId(Long tagId, Long userId);
+    Place findByPlaceIdAndUserId(Long placeId, Long userId);
 
-    @Query("SELECT p FROM Place p WHERE (p.name LIKE %:keyword% OR p.description LIKE %:keyword%) AND p.userId = :userId")
-    Optional<List<Place>> findByKeywordAndUserId(String keyword, Long userId);
+    @Query("SELECT p FROM Place p JOIN PlaceTag pt ON pt.place.placeId = p.placeId WHERE pt.tag.tagId = :id")
+    List<Place> findByTagId(Long id);
 
-    @Query("SELECT p FROM Place p WHERE p.longitude BETWEEN :minLongitude AND :maxLongitude AND p.latitude BETWEEN :minLatitude AND :maxLatitude AND p.userId = :userId")
+    @Query("SELECT p FROM Place p JOIN PlaceTag pt ON pt.place.placeId = p.placeId JOIN Token t ON pt.tag.tagId = t.tagId WHERE (p.name LIKE %:keyword% OR p.description LIKE %:keyword%) AND (t.userId = :userId OR p.userId = :userId)")
+    List<Place> findByKeywordAndUserID(String keyword, Long userId);
+
+    @Query("SELECT p FROM Place p JOIN PlaceTag pt ON pt.place.placeId = p.placeId JOIN Token t ON pt.tag.tagId = t.tagId WHERE p.latitude BETWEEN :minLatitude AND :maxLatitude AND p.longitude BETWEEN :minLongitude AND :maxLongitude AND (t.userId = :userId OR p.userId = :userId)")
     Optional<List<Place>> findByVicinityAndUserId(BigDecimal minLongitude, BigDecimal maxLongitude, BigDecimal minLatitude, BigDecimal maxLatitude, Long userId);
 
 }

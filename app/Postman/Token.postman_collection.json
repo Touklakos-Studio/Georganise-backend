@@ -56,6 +56,24 @@
 			"response": []
 		},
 		{
+			"name": "getTokensByCreator",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}{{path}}/creator/1",
+					"host": [
+						"{{url}}{{path}}"
+					],
+					"path": [
+						"creator",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "getTokensByTag",
 			"request": {
 				"method": "GET",
@@ -83,7 +101,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"accessRight\":\"R\",\r\n    \"userId\":1,\r\n    \"tagId\":1\r\n}",
+					"raw": "{\r\n    \"accessRight\":\"READER\", //OR \"WRITER\"\r\n    \"userId\":null,\r\n    \"tagId\":1\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -126,7 +144,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"accessRight\":\"W\",\r\n    \"userId\":2\r\n}",
+					"raw": "{\r\n    \"accessRight\":\"WRITER\" // OU \"READER\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -134,12 +152,12 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}{{path}}/1",
+					"raw": "{{url}}{{path}}/3775",
 					"host": [
 						"{{url}}{{path}}"
 					],
 					"path": [
-						"1"
+						"3775"
 					]
 				}
 			},

@@ -3,7 +3,7 @@ package isima.georganise.app.exception;
 public class NotFoundException extends RuntimeException {
 
     public NotFoundException() {
-        super();
+        super("Resource not found.");
     }
 
     public NotFoundException(String message) {

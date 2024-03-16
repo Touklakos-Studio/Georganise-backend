@@ -1,14 +1,12 @@
 package isima.georganise.app.entity.dao;
 
-import com.fasterxml.jackson.annotation.*;
 import isima.georganise.app.entity.dto.UserCreationDTO;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -34,7 +32,7 @@ public class User implements Serializable {
     @Column(name = "TOKEN", unique = true)
     private UUID authToken;
 
-    public User(UserCreationDTO user) {
+    public User(@NotNull UserCreationDTO user) {
         this.nickname = user.getNickname();
         this.password = user.getPassword();
         this.email = user.getEmail();

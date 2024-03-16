@@ -10,40 +10,43 @@ import isima.georganise.app.exception.NotLoggedException;
 import isima.georganise.app.exception.UnauthorizedException;
 import isima.georganise.app.exception.WrongPasswordException;
 import isima.georganise.app.repository.UsersRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
-    @Autowired
+    final
     UsersRepository usersRepository;
 
+    public UserServiceImpl(UsersRepository usersRepository) {
+        this.usersRepository = usersRepository;
+    }
+
     @Override
-    public List<User> getAllUsers(UUID authToken) {
+    public @NotNull List<User> getAllUsers(UUID authToken) {
         usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
 
         return usersRepository.findAll();
     }
 
     @Override
-    public User getUserById(UUID authToken, Long id) {
+    public User getUserById(UUID authToken, @NotNull Long id) {
         usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
 
         return usersRepository.findById(id).orElseThrow(NotFoundException::new);
     }
 
     @Override
-    public UUID createUser(UserCreationDTO user) {
+    public UUID createUser(@NotNull UserCreationDTO user) {
         return usersRepository.saveAndFlush(new User(user)).getAuthToken();
     }
 
     @Override
-    public void deleteUser(UUID authToken, Long id) {
+    public void deleteUser(UUID authToken, @NotNull Long id) {
         User user = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
 
         if (!user.getUserId().equals(id))
@@ -53,7 +56,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public User updateUser(UUID authToken, Long id, UserUpdateDTO user) {
+    public @NotNull User updateUser(UUID authToken, @NotNull Long id, @NotNull UserUpdateDTO user) {
         User loggedUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
 
         if (!loggedUser.getUserId().equals(id))
@@ -72,7 +75,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public UUID login(UserLoginDTO user) {
+    public UUID login(@NotNull UserLoginDTO user) {
         System.out.println(user.getEmail() + " is trying to login with: " + user.getPassword());
         User userToLogin = usersRepository.findByEmail(user.getEmail()).orElseThrow(NotFoundException::new);
 

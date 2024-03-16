@@ -9,6 +9,4 @@ import java.io.Serializable;
 public class TokenUpdateDTO implements Serializable {
 
     private Right accessRight;
-
-    private Long userId;
 }

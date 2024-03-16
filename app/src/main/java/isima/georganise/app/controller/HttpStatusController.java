@@ -1,6 +1,7 @@
 package isima.georganise.app.controller;
 
 import isima.georganise.app.exception.*;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,49 +15,49 @@ public class HttpStatusController {
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(value = HttpStatus.I_AM_A_TEAPOT, reason = "Something went very wrong")
-    public void handleUnknownError(Exception ex) {
+    public void handleUnknownError(@NotNull Exception ex) {
         System.err.println(MESSAGE_ERROR + ex.getMessage());
     }
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Entity not found")
-    public void handleNotFoundError(RuntimeException ex) {
+    public void handleNotFoundError(@NotNull RuntimeException ex) {
         System.err.println(MESSAGE_ERROR + ex.getMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Bad request")
-    public void handleBadRequestError(RuntimeException ex) {
+    public void handleBadRequestError(@NotNull RuntimeException ex) {
         System.err.println(MESSAGE_ERROR + ex.getMessage());
     }
 
     @ExceptionHandler(WrongPasswordException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Wrong password")
-    public void handleWrongPasswordError(RuntimeException ex) {
+    public void handleWrongPasswordError(@NotNull RuntimeException ex) {
         System.err.println(MESSAGE_ERROR + ex.getMessage());
     }
 
     @ExceptionHandler(UnimplementedException.class)
     @ResponseStatus(value = HttpStatus.NOT_IMPLEMENTED, reason = "Not implemented")
-    public void handleNotImplementedError(RuntimeException ex) {
+    public void handleNotImplementedError(@NotNull RuntimeException ex) {
         System.err.println(MESSAGE_ERROR + ex.getMessage());
     }
 
     @ExceptionHandler(NotLoggedException.class)
     @ResponseStatus(value = HttpStatus.UNAUTHORIZED, reason = "Not logged")
-    public void handleNotLoggedError(RuntimeException ex) {
+    public void handleNotLoggedError(@NotNull RuntimeException ex) {
         System.err.println(MESSAGE_ERROR + ex.getMessage());
     }
 
     @ExceptionHandler(UnauthorizedException.class)
     @ResponseStatus(value = HttpStatus.UNAUTHORIZED, reason = "Unauthorized")
-    public void handleUnauthorizedError(RuntimeException ex) {
+    public void handleUnauthorizedError(@NotNull RuntimeException ex) {
         System.err.println(MESSAGE_ERROR + ex.getMessage());
     }
 
     @ExceptionHandler(MissingRequestCookieException.class)
     @ResponseStatus(value = HttpStatus.UNAUTHORIZED, reason = "Not logged")
-    public void handleMissingRequestCookieError(Exception ex) {
+    public void handleMissingRequestCookieError(@NotNull Exception ex) {
         System.err.println(MESSAGE_ERROR + ex.getMessage());
     }
 }
