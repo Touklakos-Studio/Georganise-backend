@@ -41,8 +41,8 @@ public class ImageController {
         return ResponseEntity.ok(imageService.getImageByKeyword(authToken, keyword));
     }
 
-    @PostMapping(path = "", consumes = "multipart/form-data", produces = "application/json")
-    public @NotNull ResponseEntity<ImageDTO> createImage(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @ModelAttribute ImageCreationDTO image) {
+    @PostMapping(path = "", consumes = "application/json", produces = "application/json")
+    public @NotNull ResponseEntity<ImageDTO> createImage(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @RequestBody ImageCreationDTO image) {
         return ResponseEntity.ok(imageService.createImage(authToken, image));
     }
 

@@ -1,16 +1,17 @@
 package isima.georganise.app.entity.dto;
 
 import lombok.Data;
-import org.springframework.web.multipart.MultipartFile;
+
+import java.io.Serializable;
 
 @Data
-public class ImageCreationDTO {
+public class ImageCreationDTO implements Serializable {
 
-    private MultipartFile imageValue;
+    private String imageValue;
 
     private String name;
 
     private String description;
 
-    private boolean isPublic;
+    private Boolean isPublic;
 }

@@ -35,11 +35,11 @@ public class Image implements Serializable {
     @Column(name = "PUBLIC", nullable = false)
     private boolean isPublic;
 
-    public Image(@NotNull ImageCreationDTO imageCreationDTO, Long userId) throws IOException {
+    public Image(@NotNull ImageCreationDTO imageCreationDTO, Long userId) {
         this.userId = userId;
         this.imageValue = imageCreationDTO.getImageValue().getBytes();
         this.name = imageCreationDTO.getName();
         this.description = imageCreationDTO.getDescription();
-        this.isPublic = imageCreationDTO.isPublic();
+        this.isPublic = imageCreationDTO.getIsPublic();
     }
 }
