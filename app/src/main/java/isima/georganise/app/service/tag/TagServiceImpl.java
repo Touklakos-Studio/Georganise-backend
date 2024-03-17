@@ -84,7 +84,22 @@ public class TagServiceImpl implements TagService {
     public Iterable<Tag> getTagsByKeyword(UUID authToken, String keyword) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
 
-        return tagsRepository.findByKeywordAndUserId(keyword, currentUser.getUserId()).orElseThrow(NotFoundException::new);
+        List<Tag> tags = tagsRepository.findByKeyword(keyword);
+
+        if (tags.isEmpty()) throw new NotFoundException();
+
+        List<Tag> tagsToReturn = new ArrayList<>();
+        for (Tag tag : tags) {
+            if (tag.getUserId().equals(currentUser.getUserId())) {
+                tagsToReturn.add(tag);
+                continue;
+            }
+
+            List<Token> tokens = tokensRepository.findByUserIdAndTagId(currentUser.getUserId(), tag.getTagId());
+            if (!tokens.isEmpty()) tagsToReturn.add(tag);
+        }
+
+        return tagsToReturn;
     }
 
     @Override
