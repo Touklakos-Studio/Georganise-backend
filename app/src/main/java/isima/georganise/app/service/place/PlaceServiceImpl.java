@@ -18,9 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class PlaceServiceImpl implements PlaceService {
@@ -88,6 +86,14 @@ public class PlaceServiceImpl implements PlaceService {
 
         List<Place> places = placesRepository.findAll();
 
+        List<Place> placesToReturn = removeUnautorizedPlace(places, userCurrent);
+        placesToReturn.sort(Comparator.comparing(Place::getPlaceId));
+
+        return placesToReturn;
+    }
+
+    @NotNull
+    private List<Place> removeUnautorizedPlace(List<Place> places, User userCurrent) {
         List<Place> placesToReturn = new ArrayList<>();
         for (Place place : places) {
             if (place.getUserId().equals(userCurrent.getUserId())) {
@@ -103,7 +109,6 @@ public class PlaceServiceImpl implements PlaceService {
                 }
             }
         }
-
         return placesToReturn;
     }
 
@@ -130,21 +135,8 @@ public class PlaceServiceImpl implements PlaceService {
 
         if (places.isEmpty()) throw new NotFoundException("User " + userCurrent.getUserId() + " has no places with keyword " + keyword + ".");
 
-        List<Place> placesToReturn = new ArrayList<>();
-        for (Place place : places) {
-            if (place.getUserId().equals(userCurrent.getUserId())) {
-                placesToReturn.add(place);
-                continue;
-            }
-
-            List<Tag> tags = place.getPlaceTags().stream().map(PlaceTag::getTag).toList();
-            for (Tag tag : tags) {
-                if (tag.getUserId().equals(userCurrent.getUserId()) || !tokensRepository.findByUserIdAndTagId(userCurrent.getUserId(), tag.getTagId()).isEmpty()){
-                    placesToReturn.add(place);
-                    break;
-                }
-            }
-        }
+        List<Place> placesToReturn = removeUnautorizedPlace(places, userCurrent);
+        placesToReturn.sort(Comparator.comparing(Place::getPlaceId));
 
         return placesToReturn;
     }
