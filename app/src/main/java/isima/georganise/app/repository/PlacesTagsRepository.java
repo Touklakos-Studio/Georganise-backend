@@ -13,4 +13,6 @@ public interface PlacesTagsRepository extends JpaRepository<PlaceTag, Long> {
     Iterable<PlaceTag> findByTag_TagId(Long id);
 
     Optional<PlaceTag> findByTag_TagIdAndPlace_PlaceId(Long id, Long placeId);
+
+    Iterable<PlaceTag> findByPlace_PlaceId(Long placeId);
 }

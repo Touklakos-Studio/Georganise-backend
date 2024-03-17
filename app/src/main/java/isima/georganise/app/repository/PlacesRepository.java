@@ -25,4 +25,5 @@ public interface PlacesRepository extends JpaRepository<Place, Long> {
     @Query("SELECT p FROM Place p JOIN PlaceTag pt ON pt.place.placeId = p.placeId JOIN Token t ON pt.tag.tagId = t.tagId WHERE p.latitude BETWEEN :minLatitude AND :maxLatitude AND p.longitude BETWEEN :minLongitude AND :maxLongitude AND (t.userId = :userId OR p.userId = :userId)")
     Optional<List<Place>> findByVicinityAndUserId(BigDecimal minLongitude, BigDecimal maxLongitude, BigDecimal minLatitude, BigDecimal maxLatitude, Long userId);
 
+    List<Place> findByImageId(Long imageId);
 }
