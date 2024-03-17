@@ -19,8 +19,8 @@ public interface PlacesRepository extends JpaRepository<Place, Long> {
     @Query("SELECT p FROM Place p JOIN PlaceTag pt ON pt.place.placeId = p.placeId WHERE pt.tag.tagId = :id")
     List<Place> findByTagId(Long id);
 
-    @Query("SELECT p FROM Place p JOIN PlaceTag pt ON pt.place.placeId = p.placeId JOIN Token t ON pt.tag.tagId = t.tagId WHERE (UPPER(p.name) LIKE UPPER('%:keyword%') OR UPPER(p.description) LIKE UPPER('%:keyword%') OR UPPER(pt.tag.title) LIKE UPPER('%:keyword%') OR UPPER(pt.tag.description) LIKE UPPER('%:keyword%')) AND (t.userId = :userId OR p.userId = :userId)")
-    List<Place> findByKeywordAndUserID(String keyword, Long userId);
+    @Query("SELECT p FROM Place p JOIN PlaceTag pt ON pt.place.placeId = p.placeId WHERE UPPER(p.name) LIKE UPPER(CONCAT('%', :keyword, '%')) OR UPPER(p.description) LIKE UPPER(CONCAT('%', :keyword, '%')) OR UPPER(pt.tag.title) LIKE UPPER(CONCAT('%', :keyword, '%')) OR UPPER(pt.tag.description) LIKE UPPER(CONCAT('%', :keyword, '%'))")
+    List<Place> findByKeyword(String keyword);
 
     @Query("SELECT p FROM Place p JOIN PlaceTag pt ON pt.place.placeId = p.placeId JOIN Token t ON pt.tag.tagId = t.tagId WHERE p.latitude BETWEEN :minLatitude AND :maxLatitude AND p.longitude BETWEEN :minLongitude AND :maxLongitude AND (t.userId = :userId OR p.userId = :userId)")
     Optional<List<Place>> findByVicinityAndUserId(BigDecimal minLongitude, BigDecimal maxLongitude, BigDecimal minLatitude, BigDecimal maxLatitude, Long userId);
