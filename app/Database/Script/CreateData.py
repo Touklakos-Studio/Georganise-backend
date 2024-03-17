@@ -139,7 +139,7 @@ class places:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
             for place in places:
-                writer.writerow({'ID': place.id, 'NAME': place.name, 'LAT': place.lat, 'LNG': place.lng, 'DESCRIPTION': place.description, 'IMAGE': place.image.id, 'USER': place.user.id})
+                writer.writerow({'ID': place.id, 'NAME': place.name, 'LAT': place.lat, 'LNG': place.lng, 'DESCRIPTION': place.description, 'IMAGE': None if place.image == None else place.image.id, 'USER': place.user.id})
 
 class tags:
     ids = count(1)
@@ -251,7 +251,9 @@ def innit_data(nb_users, nb_tags, nb_images):
     
     places_list = []
     for user in users_list:
-        places_list_temp = [places(user, random.choice(image_list)) for _ in range(random.randint(0, 50))]
+        usable_images = [image for image in image_list if image.user == user or image.public]
+        usable_images.append(None)
+        places_list_temp = [places(user, random.choice(usable_images)) for _ in range(random.randint(0, 50))]
         places_list.extend(places_list_temp)
     
     places_tags_list = []
