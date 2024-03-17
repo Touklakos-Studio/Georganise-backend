@@ -34,7 +34,7 @@ public class Place implements Serializable {
     @Column(name = "DESCRIPTION")
     private String description;
 
-    @Column(name = "IMAGEID", nullable = false)
+    @Column(name = "IMAGEID")
     private Long imageId;
 
     @Column(name = "USERID", updatable = false, nullable = false)
