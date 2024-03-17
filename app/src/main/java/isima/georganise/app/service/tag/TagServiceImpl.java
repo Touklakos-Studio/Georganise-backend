@@ -112,22 +112,8 @@ public class TagServiceImpl implements TagService {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
         Tag tagToUpdate = checkTagAccessRight(id, currentUser, "update tag of user ");
 
-        if (tag.getTitle() != null) {
-            tagToUpdate.setTitle(tag.getTitle());
-        }
         if (tag.getDescription() != null) {
             tagToUpdate.setDescription(tag.getDescription());
-        }
-        if (tag.getPlaceIds() != null) {
-            List<PlaceTag> placeTag = new ArrayList<>();
-            for (Long placeId : tag.getPlaceIds()) {
-                Place place = placesRepository.findByPlaceIdAndUserId(placeId, currentUser.getUserId());
-                if (place == null)
-                    throw new UnauthorizedException(currentUser.getNickname(), "update tag with place of user " + placeId);
-                placeTag.add(new PlaceTag(place, tagToUpdate));
-            }
-            placesTagsRepository.saveAllAndFlush(placeTag);
-            tagToUpdate.setPlaceTags(placeTag);
         }
 
         return tagsRepository.saveAndFlush(tagToUpdate);
