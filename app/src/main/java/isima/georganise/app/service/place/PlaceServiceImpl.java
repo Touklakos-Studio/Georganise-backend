@@ -201,16 +201,15 @@ public class PlaceServiceImpl implements PlaceService {
         if (place.getImageId() != null)
             existingPlace.setImageId(place.getImageId());
         List<PlaceTag> placeTags = new ArrayList<>();
-        if (place.getTagIds() != null) {
-            for (Long tagId : place.getTagIds()) {
-                if (existingPlace.getPlaceTags().stream().noneMatch(placeTag -> placeTag.getTag().getTagId().equals(tagId))) {
-                    Tag tag = tagsRepository.findById(tagId).orElseThrow(NotFoundException::new);
-                    placeTags.add(new PlaceTag(existingPlace, tag));
-                }
-            }
+        for (Long tagId : place.getTagIds()) {
+            Tag tag = tagsRepository.findById(tagId).orElseThrow(NotFoundException::new);
+            if (!tag.getUserId().equals(existingPlace.getUserId()) && tokensRepository.findByUserIdAndTagId(existingPlace.getUserId(), tag.getTagId()).isEmpty())
+                throw new NotFoundException("User " + existingPlace.getUserId() + " has no access token to tag " + tag.getTagId() + ".");
+            placeTags.add(new PlaceTag(existingPlace, tag));
         }
+        placesTagsRepository.deleteAll(existingPlace.getPlaceTags());
         placesTagsRepository.saveAllAndFlush(placeTags);
-        existingPlace.getPlaceTags().addAll(placeTags);
+        existingPlace.setPlaceTags(placeTags);
 
         return placesRepository.saveAndFlush(existingPlace);
     }
