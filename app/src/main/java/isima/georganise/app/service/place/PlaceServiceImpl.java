@@ -86,11 +86,25 @@ public class PlaceServiceImpl implements PlaceService {
         if (!userCurrent.getUserId().equals(id))
             throw new NotFoundException("User " + userCurrent.getUserId() + " has no access to this user's places.");
 
-        List<Place> places = placesRepository.findByUserId(id);
+        List<Place> places = placesRepository.findAll();
 
-        if (places.isEmpty()) throw new NotFoundException("User " + userCurrent.getUserId() + " has no places.");
+        List<Place> placesToReturn = new ArrayList<>();
+        for (Place place : places) {
+            if (place.getUserId().equals(userCurrent.getUserId())) {
+                placesToReturn.add(place);
+                continue;
+            }
 
-        return places;
+            List<Tag> tags = place.getPlaceTags().stream().map(PlaceTag::getTag).toList();
+            for (Tag tag : tags) {
+                if (tag.getUserId().equals(userCurrent.getUserId()) || !tokensRepository.findByUserIdAndTagId(userCurrent.getUserId(), tag.getTagId()).isEmpty()){
+                    placesToReturn.add(place);
+                    break;
+                }
+            }
+        }
+
+        return placesToReturn;
     }
 
     @Override
