@@ -56,6 +56,24 @@
 			"response": []
 		},
 		{
+			"name": "getTagByPlaceTag",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}{{path}}/placeTag/1",
+					"host": [
+						"{{url}}{{path}}"
+					],
+					"path": [
+						"placeTag",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "createTag",
 			"request": {
 				"method": "POST",

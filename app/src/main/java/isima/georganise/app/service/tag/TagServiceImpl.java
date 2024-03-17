@@ -143,6 +143,19 @@ public class TagServiceImpl implements TagService {
         placesTagsRepository.delete(placeTag);
     }
 
+    @Override
+    public Tag getTagByPlaceId(UUID authToken, Long id) {
+        User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
+        PlaceTag placeTag = placesTagsRepository.findById(id).orElseThrow(NotFoundException::new);
+
+        if (!currentUser.getUserId().equals(placeTag.getTag().getUserId())) {
+            List<Token> tokens = tokensRepository.findByUserIdAndTagId(currentUser.getUserId(), placeTag.getTag().getTagId());
+            if (tokens.isEmpty()) throw new UnauthorizedException(currentUser.getNickname(), "get tag of user " + placeTag.getTag().getUserId());
+        }
+
+        return placeTag.getTag();
+    }
+
     @NotNull
     private Tag checkTagAccessRight(@NotNull Long id, User currentUser, String x) {
         Tag tagToUpdate = tagsRepository.findById(id).orElseThrow(NotFoundException::new);

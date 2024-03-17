@@ -1,15 +1,13 @@
 package isima.georganise.app.service.place;
 
 
-import isima.georganise.app.entity.dao.Place;
-import isima.georganise.app.entity.dao.PlaceTag;
-import isima.georganise.app.entity.dao.Tag;
-import isima.georganise.app.entity.dao.User;
+import isima.georganise.app.entity.dao.*;
 import isima.georganise.app.entity.dto.GetPlaceVicinityDTO;
 import isima.georganise.app.entity.dto.PlaceCreationDTO;
 import isima.georganise.app.entity.dto.PlaceUpdateDTO;
 import isima.georganise.app.exception.NotFoundException;
 import isima.georganise.app.exception.NotLoggedException;
+import isima.georganise.app.exception.UnauthorizedException;
 import isima.georganise.app.repository.*;
 import isima.georganise.app.service.util.GpsFormatConverter;
 import org.jetbrains.annotations.NotNull;
@@ -215,6 +213,19 @@ public class PlaceServiceImpl implements PlaceService {
         existingPlace.getPlaceTags().addAll(placeTags);
 
         return placesRepository.saveAndFlush(existingPlace);
+    }
+
+    @Override
+    public Place getPlacesByPlaceTag(UUID authToken, Long id) {
+        User userCurrent = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
+        PlaceTag placeTag = placesTagsRepository.findById(id).orElseThrow(NotFoundException::new);
+
+        if (!placeTag.getPlace().getUserId().equals(userCurrent.getUserId())) {
+            List<Token> tokens = tokensRepository.findByUserIdAndTagId(userCurrent.getUserId(), placeTag.getTag().getTagId());
+            if (tokens.isEmpty()) throw new UnauthorizedException(userCurrent.getNickname(), "get place of user " + placeTag.getPlace().getUserId());
+        }
+
+        return placeTag.getPlace();
     }
 
     @NotNull

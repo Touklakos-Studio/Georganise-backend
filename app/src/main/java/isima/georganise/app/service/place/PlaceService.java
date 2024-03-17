@@ -29,4 +29,6 @@ public interface PlaceService {
     void deletePlace(UUID authToken, Long id);
 
     Place updatePlace(UUID authToken, Long id, PlaceUpdateDTO place);
+
+    Place getPlacesByPlaceTag(UUID authToken, Long id);
 }

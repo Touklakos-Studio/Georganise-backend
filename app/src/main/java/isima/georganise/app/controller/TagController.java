@@ -39,6 +39,11 @@ public class TagController {
         return ResponseEntity.ok(tagService.getTagById(authToken, id));
     }
 
+    @GetMapping(path = "/placeTag/{id}", produces = "application/json")
+    public @NotNull ResponseEntity<Tag> getTagByPlaceId(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @PathVariable("id") Long id) {
+        return ResponseEntity.ok(tagService.getTagByPlaceId(authToken, id));
+    }
+
     @PostMapping(path = "", consumes = "application/json", produces = "application/json")
     public @NotNull ResponseEntity<Tag> createTag(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @RequestBody TagCreationDTO tag) {
         return ResponseEntity.ok(tagService.createTag(authToken, tag));
