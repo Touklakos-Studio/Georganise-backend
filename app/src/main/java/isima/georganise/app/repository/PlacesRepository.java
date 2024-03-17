@@ -14,8 +14,6 @@ public interface PlacesRepository extends JpaRepository<Place, Long> {
 
     List<Place> findByUserId(Long id);
 
-    Place findByPlaceIdAndUserId(Long placeId, Long userId);
-
     @Query("SELECT p FROM Place p JOIN PlaceTag pt ON pt.place.placeId = p.placeId WHERE pt.tag.tagId = :id")
     List<Place> findByTagId(Long id);
 

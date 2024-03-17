@@ -1,6 +1,7 @@
 package isima.georganise.app.service.image;
 
 import isima.georganise.app.entity.dao.Image;
+import isima.georganise.app.entity.dao.Place;
 import isima.georganise.app.entity.dao.User;
 import isima.georganise.app.entity.dto.ImageCreationDTO;
 import isima.georganise.app.entity.dto.ImageDTO;
@@ -8,12 +9,15 @@ import isima.georganise.app.entity.dto.ImageUpdateDTO;
 import isima.georganise.app.exception.NotFoundException;
 import isima.georganise.app.exception.NotLoggedException;
 import isima.georganise.app.repository.ImagesRepository;
+import isima.georganise.app.repository.PlacesRepository;
 import isima.georganise.app.repository.UsersRepository;
+import isima.georganise.app.service.place.PlaceService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -23,12 +27,16 @@ public class ImageServiceImpl implements ImageService {
 
     private final @NotNull UsersRepository usersRepository;
 
+    private final @NotNull PlacesRepository placesRepository;
+
     @Autowired
-    public ImageServiceImpl(@NotNull ImagesRepository imagesRepository, @NotNull UsersRepository usersRepository) {
+    public ImageServiceImpl(@NotNull ImagesRepository imagesRepository, @NotNull UsersRepository usersRepository, @NotNull PlacesRepository placesRepository) {
         Assert.notNull(imagesRepository, "ImagesRepository cannot be null");
         Assert.notNull(usersRepository, "UsersRepository cannot be null");
+        Assert.notNull(placesRepository, "PlaceService cannot be null");
         this.imagesRepository = imagesRepository;
         this.usersRepository = usersRepository;
+        this.placesRepository = placesRepository;
     }
 
     @Override
@@ -72,6 +80,12 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public void deleteImage(UUID authToken, Long id) {
         Image image = checkImageAccessRights(authToken, id);
+
+        List<Place> places = placesRepository.findByImageId(id);
+        for (Place place : places) {
+            place.setImageId(null);
+            placesRepository.saveAndFlush(place);
+        }
 
         imagesRepository.delete(image);
     }
