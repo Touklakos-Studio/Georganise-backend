@@ -11,8 +11,8 @@ import java.util.Optional;
 @Repository
 public interface TagsRepository extends JpaRepository<Tag, Long> {
 
-    @Query("SELECT ta FROM Tag ta JOIN Token to ON ta.tagId=to.tagId WHERE (ta.title LIKE %:keyword% OR ta.description LIKE %:keyword%) AND (ta.userId = :userId OR to.userId = :userId)")
-    Optional<Iterable<Tag>> findByKeywordAndUserId(String keyword, Long userId);
+    @Query("SELECT ta FROM Tag ta WHERE (UPPER(ta.title) LIKE UPPER(CONCAT('%', :keyword, '%')) OR UPPER(ta.description) LIKE UPPER(CONCAT('%', :keyword, '%')))")
+    List<Tag> findByKeyword(String keyword);
 
     Optional<Tag> findByTitleAndUserId(String title, Long userId);
 
