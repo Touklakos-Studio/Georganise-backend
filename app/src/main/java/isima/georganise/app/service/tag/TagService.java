@@ -25,4 +25,6 @@ public interface TagService {
     Tag updateTag(UUID authToken, Long id, TagUpdateDTO tag);
 
     void removePlaceFromTag(UUID authToken, Long id, RemovePlaceFromTagDTO placeId);
+
+    Tag getTagByPlaceId(UUID authToken, Long id);
 }

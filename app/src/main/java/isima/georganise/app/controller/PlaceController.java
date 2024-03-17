@@ -54,6 +54,11 @@ public class PlaceController {
         return ResponseEntity.ok(placeService.getPlaceById(authToken, id));
     }
 
+    @GetMapping(path = "/placeTag/{id}", produces = "application/json")
+    public @NotNull ResponseEntity<Place> getPlacesByPlaceTag(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @PathVariable("id") Long id) {
+        return ResponseEntity.ok(placeService.getPlacesByPlaceTag(authToken, id));
+    }
+
     @PostMapping(path = "", consumes = "application/json", produces = "application/json")
     public @NotNull ResponseEntity<Place> createPlace(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @RequestBody PlaceCreationDTO place) {
         return ResponseEntity.ok(placeService.createPlace(authToken, place));

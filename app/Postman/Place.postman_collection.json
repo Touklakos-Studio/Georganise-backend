@@ -21,10 +21,39 @@
 			"response": []
 		},
 		{
-			"name": "getPlaceById",
+			"name": "getPlaceByIdJson",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{url}}{{path}}/1",
+					"host": [
+						"{{url}}{{path}}"
+					],
+					"path": [
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getPlaceByIdGPX",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/gpx+xml",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{url}}{{path}}/1",
 					"host": [
@@ -115,6 +144,24 @@
 					],
 					"path": [
 						"around"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getPlaceByPlaceTag",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}{{path}}/placeTag/1",
+					"host": [
+						"{{url}}{{path}}"
+					],
+					"path": [
+						"placeTag",
+						"1"
 					]
 				}
 			},
