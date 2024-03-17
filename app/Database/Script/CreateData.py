@@ -190,12 +190,11 @@ class places_tags:
         return f"PLACE_TAG({self.id}, {self.place}, {self.tag})"
     
     def add_tag(self, tag):
-        if tag not in self.tag:
-            self.tag.append(tag)
-            print("Tag added successfully", self, tag)
-            return True
-        print("Tag already in list", self, tag)
-        return False
+        if tag in self.tag:
+            print("Tag already in place_tag")
+            return False
+        self.tag.append(tag)
+        return True
     
     @staticmethod
     def save_places_tags(places_tags):
@@ -260,9 +259,14 @@ def innit_data(nb_users, nb_tags, nb_images):
     for place in places_list:
         tags_user = [tag for tag in tags_list if tag.user == place.user]
         places_tags_list_temp = [places_tags(place) for _ in range(random.randint(0, len(tags_user)))]
+        print(place)
         for place_tag in places_tags_list_temp:
-            while not place_tag.add_tag(random.choice(tags_user)):
-                continue
+            print(place_tag)
+            tag = random.choice(tags_user)
+            while not place_tag.add_tag(tag):
+                tag = random.choice(tags_user)
+            tags_user.remove(tag)
+            print(place_tag)
 
         places_tags_list.extend(places_tags_list_temp)
 
