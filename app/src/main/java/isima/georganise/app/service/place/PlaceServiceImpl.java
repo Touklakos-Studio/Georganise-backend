@@ -112,12 +112,27 @@ public class PlaceServiceImpl implements PlaceService {
     @Override
     public @NotNull List<Place> getPlacesByKeyword(UUID authToken, String keyword) {
         User userCurrent = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
-        List<Place> places = placesRepository.findByKeywordAndUserID(keyword, userCurrent.getUserId());
+        List<Place> places = placesRepository.findByKeyword(keyword);
 
-        if (places.isEmpty())
-            throw new NotFoundException("User " + userCurrent.getUserId() + " has no places with keyword " + keyword + ".");
+        if (places.isEmpty()) throw new NotFoundException("User " + userCurrent.getUserId() + " has no places with keyword " + keyword + ".");
 
-        return places;
+        List<Place> placesToReturn = new ArrayList<>();
+        for (Place place : places) {
+            if (place.getUserId().equals(userCurrent.getUserId())) {
+                placesToReturn.add(place);
+                continue;
+            }
+
+            List<Tag> tags = place.getPlaceTags().stream().map(PlaceTag::getTag).toList();
+            for (Tag tag : tags) {
+                if (tag.getUserId().equals(userCurrent.getUserId()) || !tokensRepository.findByUserIdAndTagId(userCurrent.getUserId(), tag.getTagId()).isEmpty()){
+                    placesToReturn.add(place);
+                    break;
+                }
+            }
+        }
+
+        return placesToReturn;
     }
 
     @Override
