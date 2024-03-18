@@ -32,12 +32,4 @@ public class PlaceTag implements Serializable {
         this.place = place;
         this.tag = tag;
     }
-    
-    public String toString() {
-        return "PlaceTag{" +
-                "placeTagId=" + placeTagId +
-                ", placeId=" + place.getPlaceId() +
-                ", tagId=" + tag.getTagId() +
-                '}';
-    }
 }

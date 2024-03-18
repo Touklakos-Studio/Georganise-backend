@@ -53,7 +53,7 @@ public class TokenController {
         return ResponseEntity.ok(tokenService.getTokensByTag(authToken, id));
     }
 
-    @PostMapping(path = "/new", produces = "application/json", consumes = "application/json")
+    @GetMapping(path = "/new", produces = "application/json")
     public @NotNull ResponseEntity<Token> generateToken(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @RequestBody TokenCreationDTO token) {
         System.out.println("TokenController.generateToken: " + token.toString());
         return ResponseEntity.ok(tokenService.createToken(authToken, token));
