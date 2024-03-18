@@ -79,13 +79,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}{{path}}/tag/1",
+					"raw": "{{url}}{{path}}/tag/2",
 					"host": [
 						"{{url}}{{path}}"
 					],
 					"path": [
 						"tag",
-						"1"
+						"2"
 					]
 				}
 			},
@@ -98,7 +98,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"accessRight\":\"READER\", //OR \"WRITER\"\r\n    \"userId\":null,\r\n    \"tagId\":1\r\n}",
+					"raw": "{\r\n    \"accessRight\":\"READER\", //OR \"WRITER\"\r\n    \"nickname\":null,\r\n    \"tagId\":51\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
