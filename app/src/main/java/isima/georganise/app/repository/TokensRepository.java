@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface TokensRepository extends JpaRepository<Token, Long> {
@@ -17,4 +18,6 @@ public interface TokensRepository extends JpaRepository<Token, Long> {
     List<Token> findByUserIdAndTagId(Long userId, Long tagId);
 
     List<Token> findByTagId(Long tagId);
+
+    Optional<Token> findByTokenValue(UUID token);
 }
