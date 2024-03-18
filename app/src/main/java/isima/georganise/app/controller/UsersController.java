@@ -34,8 +34,8 @@ public class UsersController {
     }
 
     @GetMapping(path = "/{id}", produces = "application/json")
-    public @NotNull ResponseEntity<GetUserNicknameDTO> getUserById(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @PathVariable("id") Long id) {
-        System.out.println("UsersController.getUserById: " + id);
+    public @NotNull ResponseEntity<GetUserNicknameDTO> getUserNameById(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @PathVariable("id") Long id) {
+        System.out.println("UsersController.getUserNameById: " + id);
         return ResponseEntity.ok(userService.getUserById(authToken, id));
     }
 

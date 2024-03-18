@@ -71,8 +71,20 @@ public class TokenServiceImpl implements TokenService {
     public @NotNull Iterable<Token> getTokensByTag(UUID authToken, Long id) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
         System.out.println("\twith user: " + currentUser.getUserId());
-        List<Token> tokens = tokensRepository.findByUserIdAndTagId(currentUser.getUserId(), id);
-        System.out.println("\tfetched " + tokens.size() + " tokens");
+
+        Tag tag = tagsRepository.findById(id).orElseThrow(NotFoundException::new);
+        System.out.println("\tfetched tag: " + tag);
+
+        List<Token> tokens;
+        if (tag.getUserId().equals(currentUser.getUserId())) {
+            System.out.println("\tuser " + currentUser.getUserId() + " is the owner of the tag " + tag.getTagId());
+            tokens = tokensRepository.findByCreatorIdAndTagId(currentUser.getUserId(), id);
+            System.out.println("\tfetched " + tokens.size() + " tokens");
+        } else {
+            System.out.println("\tuser " + currentUser.getUserId() + " is not the owner of the tag " + tag.getTagId());
+            tokens = tokensRepository.findByUserIdAndTagId(currentUser.getUserId(), id);
+            System.out.println("\tfetched " + tokens.size() + " tokens");
+        }
 
         if (tokens.isEmpty()) {
             System.out.println("\tno tokens found for tag " + id);
