@@ -26,51 +26,61 @@ public class PlaceController {
 
     @GetMapping(path = "", produces = "application/json")
     public @NotNull ResponseEntity<Iterable<Place>> getPlaces(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken) {
+        System.out.println("PlaceController.getPlaces: ");
         return ResponseEntity.ok(placeService.getAllPlaces(authToken));
     }
 
     @GetMapping(path = "/user/{id}", produces = "application/json")
     public @NotNull ResponseEntity<Iterable<Place>> getPlacesByUser(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @PathVariable("id") Long id) {
+        System.out.println("PlaceController.getPlacesByUser: " + id);
         return ResponseEntity.ok(placeService.getPlacesByUser(authToken, id));
     }
 
     @GetMapping(path = "/tag/{id}", produces = "application/json")
     public @NotNull ResponseEntity<Iterable<Place>> getPlacesByTag(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @PathVariable("id") Long id) {
+        System.out.println("PlaceController.getPlacesByTag: " + id);
         return ResponseEntity.ok(placeService.getPlacesByTag(authToken, id));
     }
 
     @GetMapping(path = "/keyword/{keyword}", produces = "application/json")
     public @NotNull ResponseEntity<Iterable<Place>> getPlacesByKeyword(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @PathVariable("keyword") String keyword) {
+        System.out.println("PlaceController.getPlacesByKeyword: " + keyword);
         return ResponseEntity.ok(placeService.getPlacesByKeyword(authToken, keyword));
     }
 
     @GetMapping(path = "/around", produces = "application/json")
     public @NotNull ResponseEntity<Iterable<Place>> getPlacesByVicinity(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @RequestBody GetPlaceVicinityDTO dto) {
+        System.out.println("PlaceController.getPlacesByVicinity: " + dto.toString());
         return ResponseEntity.ok(placeService.getPlacesByVicinity(authToken, dto));
     }
 
     @GetMapping(path = "/{id}", produces = "application/json")
     public @NotNull ResponseEntity<Place> getPlaceById(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @PathVariable("id") Long id) {
+        System.out.println("PlaceController.getPlaceById: " + id);
         return ResponseEntity.ok(placeService.getPlaceById(authToken, id));
     }
 
     @GetMapping(path = "/placeTag/{id}", produces = "application/json")
     public @NotNull ResponseEntity<Place> getPlacesByPlaceTag(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @PathVariable("id") Long id) {
+        System.out.println("PlaceController.getPlacesByPlaceTag: " + id);
         return ResponseEntity.ok(placeService.getPlacesByPlaceTag(authToken, id));
     }
 
     @PostMapping(path = "", consumes = "application/json", produces = "application/json")
     public @NotNull ResponseEntity<Place> createPlace(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @RequestBody PlaceCreationDTO place) {
+        System.out.println("PlaceController.createPlace: " + place.toString());
         return ResponseEntity.ok(placeService.createPlace(authToken, place));
     }
 
     @PutMapping(path = "/{id}", consumes = "application/json", produces = "application/json")
     public @NotNull ResponseEntity<Place> updatePlace(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @PathVariable("id") Long id, @RequestBody PlaceUpdateDTO place) {
+        System.out.println("PlaceController.updatePlace: " + id + ": " + place.toString());
         return ResponseEntity.ok(placeService.updatePlace(authToken, id, place));
     }
 
     @DeleteMapping(path = "/{id}")
     public @NotNull ResponseEntity<Void> deletePlace(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @PathVariable("id") Long id) {
+        System.out.println("PlaceController.deletePlace: " + id);
         placeService.deletePlace(authToken, id);
         return ResponseEntity.ok().build();
     }

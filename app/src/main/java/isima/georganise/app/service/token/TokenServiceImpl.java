@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -42,18 +43,26 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public @NotNull List<Token> getAllTokens(UUID authToken) {
-        usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
+        User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
+        System.out.println("\twith user: " + currentUser.getUserId());
 
-        return tokensRepository.findAll();
+        Iterable<Token> tokens = tokensRepository.findByUserId(currentUser.getUserId()).orElse(new ArrayList<>());
+        System.out.println("\tfetched " + tokens.spliterator().getExactSizeIfKnown() + " tokens");
+
+        return (List<Token>) tokens;
     }
 
     @Override
     public @NotNull Token getTokenById(UUID authToken, @NotNull Long id) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
+        System.out.println("\twith user: " + currentUser.getUserId());
         Token token = tokensRepository.findById(id).orElseThrow(NotFoundException::new);
+        System.out.println("\tfetched token: " + token);
 
-        if (!token.getUserId().equals(currentUser.getUserId()))
+        if (!token.getUserId().equals(currentUser.getUserId())) {
+            System.out.println("\tuser " + currentUser.getUserId() + " is not the owner of the token " + token.getTokenId() + " owned by " + token.getUserId());
             throw new NotFoundException("Token not found");
+        }
 
         return token;
     }
@@ -61,10 +70,14 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public @NotNull Iterable<Token> getTokensByTag(UUID authToken, Long id) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
+        System.out.println("\twith user: " + currentUser.getUserId());
         List<Token> tokens = tokensRepository.findByUserIdAndTagId(currentUser.getUserId(), id);
+        System.out.println("\tfetched " + tokens.size() + " tokens");
 
-        if (tokens.isEmpty())
+        if (tokens.isEmpty()) {
+            System.out.println("\tno tokens found for tag " + id);
             throw new NotFoundException("No tokens found for tag " + id);
+        }
 
         return tokens;
     }
@@ -72,61 +85,83 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public @NotNull Token createToken(UUID authToken, @NotNull TokenCreationDTO token) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
+        System.out.println("\twith user: " + currentUser.getUserId());
 
-        if (Objects.isNull(token.getAccessRight()))
-            throw new IllegalArgumentException("Access right is required");
-        if (Objects.isNull(token.getTagId()))
-            throw new IllegalArgumentException("Tag id is required");
+        if (Objects.isNull(token.getAccessRight())) throw new IllegalArgumentException("Access right is required");
+        if (Objects.isNull(token.getTagId())) throw new IllegalArgumentException("Tag id is required");
 
         Tag tag = tagsRepository.findById(token.getTagId()).orElseThrow(NotFoundException::new);
+        System.out.println("\tfetched tag: " + tag);
 
-        if (!tag.getUserId().equals(currentUser.getUserId()))
+        if (!tag.getUserId().equals(currentUser.getUserId())) {
+            System.out.println("\tuser " + currentUser.getUserId() + " is not the owner of the tag " + tag.getTagId() + " owned by " + tag.getUserId());
             throw new UnauthorizedException(currentUser.getNickname(), "create token for tag " + tag.getTagId());
+        }
 
-        return tokensRepository.saveAndFlush(new Token(token, currentUser.getUserId()));
+        Token newToken = tokensRepository.saveAndFlush(new Token(token, currentUser.getUserId()));
+        System.out.println("\tcreated token: " + newToken);
+        return newToken;
     }
 
     @Override
     public void deleteToken(UUID authToken, @NotNull Long id) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
+        System.out.println("\twith user: " + currentUser.getUserId());
         Token token = tokensRepository.findById(id).orElseThrow(NotFoundException::new);
+        System.out.println("\tfetched token: " + token);
 
-        if (!token.getCreatorId().equals(currentUser.getUserId()))
+        if (!token.getCreatorId().equals(currentUser.getUserId())) {
+            System.out.println("\tuser " + currentUser.getUserId() + " is not the owner of the token " + token.getTokenId() + " owned by " + token.getCreatorId());
             throw new UnauthorizedException(currentUser.getNickname(), "delete token " + id);
+        }
 
         tokensRepository.delete(token);
+        System.out.println("\tdeleted token: " + token);
     }
 
     @Override
     public @NotNull Token updateToken(UUID authToken, @NotNull Long id, @NotNull TokenUpdateDTO token) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
+        System.out.println("\twith user: " + currentUser.getUserId());
         Token tokenToUpdate = tokensRepository.findById(id).orElseThrow(NotFoundException::new);
+        System.out.println("\tfetched token: " + tokenToUpdate);
 
-        if (!tokenToUpdate.getCreatorId().equals(currentUser.getUserId()))
+        if (!tokenToUpdate.getCreatorId().equals(currentUser.getUserId())) {
+            System.out.println("\tuser " + currentUser.getUserId() + " is not the owner of the token " + tokenToUpdate.getTokenId() + " owned by " + tokenToUpdate.getCreatorId());
             throw new UnauthorizedException(currentUser.getNickname(), "update token " + id);
+        }
 
-        if (token.getAccessRight() != null)
+        if (token.getAccessRight() != null) {
+            System.out.println("\tupdating access right to: " + token.getAccessRight() + " from: " + tokenToUpdate.getAccessRight());
             tokenToUpdate.setAccessRight(token.getAccessRight());
+        }
 
-        return tokensRepository.saveAndFlush(tokenToUpdate);
+        Token newToken = tokensRepository.saveAndFlush(tokenToUpdate);
+        System.out.println("\tupdated token: " + newToken);
+        return newToken;
     }
 
     @Override
     public @NotNull Token addTokenToUser(UUID authToken, @NotNull Long id) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
+        System.out.println("\twith user: " + currentUser.getUserId());
         Token tokenToUpdate = tokensRepository.findById(id).orElseThrow(NotFoundException::new);
+        System.out.println("\tfetched token: " + tokenToUpdate);
 
         if (tokenToUpdate.getUserId() != null)
             throw new IllegalArgumentException("Token already has a user assigned");
 
         tokenToUpdate.setUserId(currentUser.getUserId());
 
-        return tokensRepository.saveAndFlush(tokenToUpdate);
+        Token newToken = tokensRepository.saveAndFlush(tokenToUpdate);
+        System.out.println("\tupdated token: " + newToken);
+        return newToken;
     }
 
     @Override
     public @NotNull Iterable<Token> getTokensByUser(UUID authToken, Long id, boolean isCreator) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
+        System.out.println("\twith user: " + currentUser.getUserId());
 
         if (!currentUser.getUserId().equals(id))
             throw new UnauthorizedException(currentUser.getNickname(), "get tokens of user " + id);
@@ -137,6 +172,7 @@ public class TokenServiceImpl implements TokenService {
         } else {
             tokens = tokensRepository.findByUserId(id).orElseThrow(NotFoundException::new);
         }
+        System.out.println("\tfetched " + tokens.spliterator().getExactSizeIfKnown() + " tokens");
 
         if (!tokens.iterator().hasNext())
             throw new NotFoundException("No tokens found for user " + id);

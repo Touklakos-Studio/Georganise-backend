@@ -1,6 +1,5 @@
 package isima.georganise.app.service.image;
 
-import isima.georganise.app.entity.dao.Image;
 import isima.georganise.app.entity.dto.ImageCreationDTO;
 import isima.georganise.app.entity.dto.ImageDTO;
 import isima.georganise.app.entity.dto.ImageUpdateDTO;
