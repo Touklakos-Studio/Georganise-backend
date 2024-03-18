@@ -29,21 +29,25 @@ public class UsersController {
 
     @GetMapping(path = "", produces = "application/json")
     public @NotNull ResponseEntity<Iterable<User>> getUsers(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken) {
+        System.out.println("UsersController.getUsers: ");
         return ResponseEntity.ok(userService.getAllUsers(authToken));
     }
 
     @GetMapping(path = "/{id}", produces = "application/json")
     public @NotNull ResponseEntity<GetUserNicknameDTO> getUserById(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @PathVariable("id") Long id) {
+        System.out.println("UsersController.getUserById: " + id);
         return ResponseEntity.ok(userService.getUserById(authToken, id));
     }
 
     @GetMapping(path = "/me", produces = "application/json")
     public @NotNull ResponseEntity<User> getMe(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken) {
+        System.out.println("UsersController.getMe: ");
         return ResponseEntity.ok(userService.getMe(authToken));
     }
 
     @PostMapping(path = "", consumes = "application/json", produces = "application/json")
     public @NotNull ResponseEntity<Void> createUser(@RequestBody UserCreationDTO user, @NotNull HttpServletResponse response) {
+        System.out.println("UsersController.createUser: " + user.toString());
 
         Cookie cookie = new Cookie(AUTH_TOKEN_COOKIE_NAME, userService.createUser(user).toString());
         cookie.setPath("/");
@@ -57,17 +61,20 @@ public class UsersController {
 
     @PutMapping(path = "/{id}", consumes = "application/json", produces = "application/json")
     public @NotNull ResponseEntity<User> updateUser(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @PathVariable("id") Long id, @RequestBody UserUpdateDTO user) {
+        System.out.println("UsersController.updateUser: " + id + " " + user.toString());
         return ResponseEntity.ok(userService.updateUser(authToken, id, user));
     }
 
     @DeleteMapping(path = "/{id}")
     public @NotNull ResponseEntity<Void> deleteUser(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @PathVariable("id") Long id) {
+        System.out.println("UsersController.deleteUser: " + id);
         userService.deleteUser(authToken, id);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping(path = "/login", consumes = "application/json")
     public @NotNull ResponseEntity<Void> login(@RequestBody UserLoginDTO user, @NotNull HttpServletResponse response) {
+        System.out.println("UsersController.login: " + user.toString());
 
         Cookie cookie = new Cookie(AUTH_TOKEN_COOKIE_NAME, userService.login(user).toString());
         cookie.setPath("/");
@@ -81,6 +88,7 @@ public class UsersController {
 
     @PostMapping(path = "/logout")
     public @NotNull ResponseEntity<Void> logout(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @NotNull HttpServletResponse response) {
+        System.out.println("UsersController.logout: ");
         userService.logout(authToken);
 
         Cookie cookie = new Cookie(AUTH_TOKEN_COOKIE_NAME, null);
