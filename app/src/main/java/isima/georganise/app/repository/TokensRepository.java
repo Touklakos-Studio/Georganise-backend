@@ -20,4 +20,6 @@ public interface TokensRepository extends JpaRepository<Token, Long> {
     List<Token> findByTagId(Long tagId);
 
     Optional<Token> findByTokenValue(UUID token);
+
+    List<Token> findByCreatorIdAndTagId(Long userId, Long id);
 }

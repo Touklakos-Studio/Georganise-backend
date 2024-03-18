@@ -21,7 +21,7 @@
 			"response": []
 		},
 		{
-			"name": "getUserById",
+			"name": "getUserNameById",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -128,7 +128,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"email\": \"User2@email.com\",\r\n    \"password\": \"1be0222750aaf3889ab95b5d593ba12e4ff1046474702d6b4779f4b527305b23\"\r\n}",
+					"raw": "// {\r\n//     \"email\": \"User2@email.com\",\r\n//     \"password\": \"1be0222750aaf3889ab95b5d593ba12e4ff1046474702d6b4779f4b527305b23\"\r\n// }\r\n{\r\n    \"email\": \"User1@email.com\",\r\n    \"password\": \"19513fdc9da4fb72a4a05eb66917548d3c90ff94d5419e1f2363eea89dfee1dd\"\r\n}\r\n// {\r\n//     \"email\": \"User16@email.com\",\r\n//     \"password\": \"9630a358e80519239f62f32ddd4e47f4e798dccc2a70c50841253ee54ead3d56\"\r\n// }",
 					"options": {
 						"raw": {
 							"language": "json"
