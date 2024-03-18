@@ -102,6 +102,12 @@ public class TokenServiceImpl implements TokenService {
         if (Objects.isNull(token.getAccessRight())) throw new IllegalArgumentException("Access right is required");
         if (Objects.isNull(token.getTagId())) throw new IllegalArgumentException("Tag id is required");
 
+        User targetUser = null;
+        if (!Objects.isNull(token.getNickname())) {
+            targetUser = usersRepository.findByNickname(token.getNickname()).orElseThrow(NotFoundException::new);
+            System.out.println("\tfetched user: " + targetUser);
+        }
+
         Tag tag = tagsRepository.findById(token.getTagId()).orElseThrow(NotFoundException::new);
         System.out.println("\tfetched tag: " + tag);
 
@@ -110,7 +116,7 @@ public class TokenServiceImpl implements TokenService {
             throw new UnauthorizedException(currentUser.getNickname(), "create token for tag " + tag.getTagId());
         }
 
-        Token newToken = tokensRepository.saveAndFlush(new Token(token, currentUser.getUserId()));
+        Token newToken = tokensRepository.saveAndFlush(new Token(token, currentUser.getUserId(), Objects.isNull(targetUser) ? null : targetUser.getUserId()));
         System.out.println("\tcreated token: " + newToken);
         return newToken;
     }

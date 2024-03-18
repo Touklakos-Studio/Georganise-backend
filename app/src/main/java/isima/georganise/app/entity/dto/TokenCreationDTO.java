@@ -10,7 +10,7 @@ public class TokenCreationDTO implements Serializable {
 
     private Right accessRight;
 
-    private Long userId;
+    private String nickname;
 
     private Long tagId;
 }

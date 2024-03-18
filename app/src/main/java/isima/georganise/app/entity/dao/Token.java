@@ -36,11 +36,11 @@ public class Token implements Serializable {
     @Column(name = "TAGID", updatable = false, nullable = false)
     private Long tagId;
 
-    public Token(@NotNull TokenCreationDTO token, Long creatorId) {
+    public Token(@NotNull TokenCreationDTO token, Long creatorId, Long userId) {
         this.creatorId = creatorId;
         this.tokenValue = UUID.randomUUID();
         this.accessRight = token.getAccessRight();
-        this.userId = token.getUserId();
         this.tagId = token.getTagId();
+        this.userId = userId;
     }
 }
