@@ -25,5 +25,5 @@ public interface TokenService {
 
     Token updateToken(UUID authToken, Long id, TokenUpdateDTO token);
 
-    Token addTokenToUser(UUID authToken, Long id);
+    Token addTokenToUser(UUID authToken, UUID token);
 }

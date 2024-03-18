@@ -142,10 +142,10 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public @NotNull Token addTokenToUser(UUID authToken, @NotNull Long id) {
+    public @NotNull Token addTokenToUser(UUID authToken, @NotNull UUID token) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
         System.out.println("\twith user: " + currentUser.getUserId());
-        Token tokenToUpdate = tokensRepository.findById(id).orElseThrow(NotFoundException::new);
+        Token tokenToUpdate = tokensRepository.findByTokenValue(token).orElseThrow(NotFoundException::new);
         System.out.println("\tfetched token: " + tokenToUpdate);
 
         if (tokenToUpdate.getUserId() != null)

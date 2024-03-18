@@ -73,9 +73,9 @@ public class TokenController {
     }
 
     @PatchMapping(path = "/{id}", produces = "application/json")
-    public @NotNull ResponseEntity<Token> addTokenToUser(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @PathVariable("id") Long id) {
-        System.out.println("TokenController.addTokenToUser: " + id);
-        return ResponseEntity.ok(tokenService.addTokenToUser(authToken, id));
+    public @NotNull ResponseEntity<Token> addTokenToUser(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken, @PathVariable("id") UUID token) {
+        System.out.println("TokenController.addTokenToUser: " + token);
+        return ResponseEntity.ok(tokenService.addTokenToUser(authToken, token));
     }
 
 }
