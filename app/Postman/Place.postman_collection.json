@@ -168,13 +168,30 @@
 			"response": []
 		},
 		{
+			"name": "getRealTimePlaces",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}{{path}}/realtime",
+					"host": [
+						"{{url}}{{path}}"
+					],
+					"path": [
+						"realtime"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "createPlace",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\":\"Beach\",\r\n    \"description\":\"A beautifull beach\",\r\n    \"latitude\":0.0,\r\n    \"longitude\":0.0,\r\n    \"imageId\":null,\r\n    \"tagIds\":[],\r\n    \"realtime\":true\r\n}",
+					"raw": "{\r\n    \"name\":\"Beach\",\r\n    \"description\":\"A beautifull beach\",\r\n    \"latitude\":0.0,\r\n    \"longitude\":0.0,\r\n    \"imageId\":null,\r\n    \"tagIds\":null,\r\n    \"realtime\":true\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
