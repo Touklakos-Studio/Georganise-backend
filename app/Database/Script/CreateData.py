@@ -251,7 +251,7 @@ def innit_data(nb_users, nb_tags, nb_images):
     
     places_tags_list = []
     for place in places_list:
-        tags_user = [tag for tag in tags_list if tag.user == place.user]
+        tags_user = [tag for tag in tags_list[nb_tags:] if tag.user == place.user]
         places_tags_list_temp = [places_tags(place) for _ in range(random.randint(0, len(tags_user)))]
         print(place)
         for place_tag in places_tags_list_temp:
