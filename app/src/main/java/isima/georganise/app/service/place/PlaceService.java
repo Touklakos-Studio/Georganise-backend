@@ -31,4 +31,6 @@ public interface PlaceService {
     Place updatePlace(UUID authToken, Long id, PlaceUpdateDTO place);
 
     Place getPlacesByPlaceTag(UUID authToken, Long id);
+
+    Place getRealtimePlace(UUID authToken);
 }

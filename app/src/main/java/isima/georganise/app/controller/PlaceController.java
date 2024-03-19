@@ -84,4 +84,10 @@ public class PlaceController {
         placeService.deletePlace(authToken, id);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping(path = "/realtime", produces = "application/json")
+    public @NotNull ResponseEntity<Place> getRealTimePlaces(@CookieValue(AUTH_TOKEN_COOKIE_NAME) UUID authToken) {
+        System.out.println("PlaceController.getRealTimePlaces: ");
+        return ResponseEntity.ok(placeService.getRealtimePlace(authToken));
+    }
 }
