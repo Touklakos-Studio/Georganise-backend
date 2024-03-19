@@ -1,10 +1,13 @@
 package isima.georganise.app.controller;
 
+import isima.georganise.app.entity.dto.RealtimeConflictDTO;
 import isima.georganise.app.exception.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -65,5 +68,12 @@ public class HttpStatusController {
     @ResponseStatus(value = HttpStatus.CONFLICT, reason = "Conflict")
     public void handleConflictError(@NotNull RuntimeException ex) {
         System.err.println(MESSAGE_ERROR + ex.getMessage());
+    }
+
+    @ExceptionHandler(AlreadyCreatedException.class)
+    @ResponseBody
+    public ResponseEntity<RealtimeConflictDTO> handleAlreadyCreatedError(@NotNull AlreadyCreatedException ex) {
+        System.err.println(MESSAGE_ERROR + ex.getMessage());
+        return new ResponseEntity<>(new RealtimeConflictDTO(ex.getId()), HttpStatus.CONFLICT);
     }
 }

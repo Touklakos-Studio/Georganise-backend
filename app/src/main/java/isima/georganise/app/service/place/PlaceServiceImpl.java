@@ -5,10 +5,7 @@ import isima.georganise.app.entity.dao.*;
 import isima.georganise.app.entity.dto.GetPlaceVicinityDTO;
 import isima.georganise.app.entity.dto.PlaceCreationDTO;
 import isima.georganise.app.entity.dto.PlaceUpdateDTO;
-import isima.georganise.app.exception.ConflictException;
-import isima.georganise.app.exception.NotFoundException;
-import isima.georganise.app.exception.NotLoggedException;
-import isima.georganise.app.exception.UnauthorizedException;
+import isima.georganise.app.exception.*;
 import isima.georganise.app.repository.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -200,10 +197,11 @@ public class PlaceServiceImpl implements PlaceService {
         System.out.println("\twith user: " + userCurrent.getUserId());
 
         if (placeCreationDTO.isRealtime()) {
-            Optional<Place> realtimePlace = placesRepository.findByUserIdAndName(userCurrent.getUserId(), "{" + userCurrent.getNickname() + "} real time");
-            if (realtimePlace.isPresent()) {
-                System.out.println("\tuser already has a realtime place: " + realtimePlace.get().getPlaceId());
-                throw new ConflictException("User " + userCurrent.getUserId() + " already has a realtime place: " + realtimePlace.get().getPlaceId());
+            Tag realtimeTag = tagsRepository.findByUserIdAndTitle(userCurrent.getUserId(), "{" + userCurrent.getNickname() + "} real time").orElseThrow(NotFoundException::new);
+            List<Place> realtimePlace = placesRepository.findByTagId(realtimeTag.getTagId());
+            if (!realtimePlace.isEmpty()) {
+                System.out.println("\tuser already has a realtime place: " + realtimePlace.get(0).getPlaceId());
+                throw new AlreadyCreatedException(realtimePlace.get(0).getPlaceId(), "User " + userCurrent.getUserId() + " already has a realtime place.");
             }
         }
 
