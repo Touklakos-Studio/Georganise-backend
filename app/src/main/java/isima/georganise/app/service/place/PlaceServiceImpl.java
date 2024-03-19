@@ -5,9 +5,7 @@ import isima.georganise.app.entity.dao.*;
 import isima.georganise.app.entity.dto.GetPlaceVicinityDTO;
 import isima.georganise.app.entity.dto.PlaceCreationDTO;
 import isima.georganise.app.entity.dto.PlaceUpdateDTO;
-import isima.georganise.app.exception.NotFoundException;
-import isima.georganise.app.exception.NotLoggedException;
-import isima.georganise.app.exception.UnauthorizedException;
+import isima.georganise.app.exception.*;
 import isima.georganise.app.repository.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -198,9 +196,19 @@ public class PlaceServiceImpl implements PlaceService {
         User userCurrent = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
         System.out.println("\twith user: " + userCurrent.getUserId());
 
+        if (placeCreationDTO.isRealtime()) {
+            Tag realtimeTag = tagsRepository.findByUserIdAndTitle(userCurrent.getUserId(), "{" + userCurrent.getNickname() + "} real time").orElseThrow(NotFoundException::new);
+            List<Place> realtimePlace = placesRepository.findByTagId(realtimeTag.getTagId());
+            if (!realtimePlace.isEmpty()) {
+                System.out.println("\tuser already has a realtime place: " + realtimePlace.get(0).getPlaceId());
+                throw new AlreadyCreatedException(realtimePlace.get(0).getPlaceId(), "User " + userCurrent.getUserId() + " already has a realtime place.");
+            }
+        }
+
         if (Objects.isNull(placeCreationDTO.getLatitude())) throw new IllegalArgumentException("Latitude is required");
         if (Objects.isNull(placeCreationDTO.getLongitude())) throw new IllegalArgumentException("Longitude is required");
         if (Objects.isNull(placeCreationDTO.getName())) throw new IllegalArgumentException("Name is required");
+        if (Objects.isNull(placeCreationDTO.getTagIds())) placeCreationDTO.setTagIds((new ArrayList<>()));
 
         Place place = new Place(placeCreationDTO, userCurrent.getUserId());
         System.out.println("\tcreated place: " + place.getPlaceId());
