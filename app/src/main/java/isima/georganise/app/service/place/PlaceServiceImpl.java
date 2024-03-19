@@ -103,15 +103,6 @@ public class PlaceServiceImpl implements PlaceService {
 
     @NotNull
     private List<Place> removeUnauthorizedPlace(List<Place> places, User userCurrent) {
-        places = places.stream().filter(place -> {
-            for (PlaceTag placeTag : place.getPlaceTags()) {
-                if (placeTag.getTag().getTitle().contains("} real time")) {
-                    return false;
-                }
-            }
-            return true;
-        }).toList();
-
         List<Place> placesToReturn = new ArrayList<>();
         for (Place place : places) {
             if (place.getUserId().equals(userCurrent.getUserId())) {
