@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -30,6 +32,8 @@ public class UserServiceImpl implements UserService {
 
     private final @NotNull PlacesTagsRepository placesTagsRepository;
 
+    private final @NotNull Pattern pattern;
+
     @Autowired
     public UserServiceImpl(@NotNull UsersRepository usersRepository, @NotNull ImagesRepository imagesRepository, @NotNull PlacesRepository placesRepository, @NotNull TokensRepository tokensRepository, @NotNull TagsRepository tagsRepository, @NotNull PlacesTagsRepository placesTagsRepository) {
         Assert.notNull(usersRepository, "Users repository must not be null");
@@ -44,6 +48,7 @@ public class UserServiceImpl implements UserService {
         this.tokensRepository = tokensRepository;
         this.tagsRepository = tagsRepository;
         this.placesTagsRepository = placesTagsRepository;
+        this.pattern = Pattern.compile("^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
     }
 
     @Override
@@ -74,6 +79,8 @@ public class UserServiceImpl implements UserService {
         if (Objects.isNull(user.getNickname())) throw new IllegalArgumentException("Nickname must not be null");
         if (Objects.isNull(user.getPassword())) throw new IllegalArgumentException("Password must not be null");
         if (Objects.isNull(user.getEmail())) throw new IllegalArgumentException("Email must not be null");
+        Matcher matcher = pattern.matcher(user.getEmail());
+        if (!matcher.matches()) throw new IllegalArgumentException("Email is not valid");
 
         Optional<User> existingUser = usersRepository.findByEmail(user.getEmail());
         if (existingUser.isPresent()) {
@@ -171,6 +178,8 @@ public class UserServiceImpl implements UserService {
             userToUpdate.setPassword(user.getPassword());
         }
         if (user.getEmail() != null) {
+            Matcher matcher = pattern.matcher(user.getEmail());
+            if (!matcher.matches()) throw new IllegalArgumentException("Email is not valid");
             System.out.println("\tupdating email to: " + user.getEmail() + " from: " + userToUpdate.getEmail());
             userToUpdate.setEmail(user.getEmail());
         }
