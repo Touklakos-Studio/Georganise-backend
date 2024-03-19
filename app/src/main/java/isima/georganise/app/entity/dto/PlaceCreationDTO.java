@@ -20,4 +20,6 @@ public class PlaceCreationDTO implements Serializable {
     private List<Long> tagIds;
 
     private Long imageId;
+
+    private boolean realtime;
 }

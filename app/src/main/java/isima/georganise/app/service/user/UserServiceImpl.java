@@ -2,10 +2,7 @@ package isima.georganise.app.service.user;
 
 
 import isima.georganise.app.entity.dao.*;
-import isima.georganise.app.entity.dto.GetUserNicknameDTO;
-import isima.georganise.app.entity.dto.UserCreationDTO;
-import isima.georganise.app.entity.dto.UserLoginDTO;
-import isima.georganise.app.entity.dto.UserUpdateDTO;
+import isima.georganise.app.entity.dto.*;
 import isima.georganise.app.exception.*;
 import isima.georganise.app.repository.*;
 import org.jetbrains.annotations.NotNull;
@@ -91,6 +88,12 @@ public class UserServiceImpl implements UserService {
 
         User newUser = usersRepository.saveAndFlush(new User(user));
         System.out.println("\tUser: " + newUser + " has been successfully created");
+
+        TagCreationDTO tag = new TagCreationDTO();
+        tag.setTitle("{" + newUser.getNickname() + "} real time");
+        tag.setDescription("Real time positions of user: " + newUser.getNickname());
+        Tag realtimeTag = tagsRepository.saveAndFlush(new Tag(tag, newUser.getUserId()));
+        System.out.println("\tTag: " + realtimeTag + " has been successfully created");
         return newUser.getAuthToken();
     }
 

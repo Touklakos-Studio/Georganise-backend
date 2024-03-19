@@ -230,6 +230,13 @@ public class PlaceServiceImpl implements PlaceService {
         placesTagsRepository.saveAllAndFlush(placeTags);
         System.out.println("\tsaved place tags: " + placeTags.size());
 
+        if (placeCreationDTO.isRealtime()) {
+            Tag realtimeTag = tagsRepository.findByUserIdAndTitle(userCurrent.getUserId(), "{" + userCurrent.getNickname() + "} real time").orElseThrow(NotFoundException::new);
+            System.out.println("\tfetched realtime tag: " + realtimeTag.getTagId());
+            placesTagsRepository.save(new PlaceTag(place, realtimeTag));
+            System.out.println("\tsaved realtime place tag");
+        }
+
         return place;
     }
 
