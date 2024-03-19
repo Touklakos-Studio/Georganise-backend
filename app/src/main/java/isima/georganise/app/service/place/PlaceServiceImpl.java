@@ -5,6 +5,7 @@ import isima.georganise.app.entity.dao.*;
 import isima.georganise.app.entity.dto.GetPlaceVicinityDTO;
 import isima.georganise.app.entity.dto.PlaceCreationDTO;
 import isima.georganise.app.entity.dto.PlaceUpdateDTO;
+import isima.georganise.app.exception.ConflictException;
 import isima.georganise.app.exception.NotFoundException;
 import isima.georganise.app.exception.NotLoggedException;
 import isima.georganise.app.exception.UnauthorizedException;
@@ -198,9 +199,18 @@ public class PlaceServiceImpl implements PlaceService {
         User userCurrent = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
         System.out.println("\twith user: " + userCurrent.getUserId());
 
+        if (placeCreationDTO.isRealtime()) {
+            Optional<Place> realtimePlace = placesRepository.findByUserIdAndName(userCurrent.getUserId(), "{" + userCurrent.getNickname() + "} real time");
+            if (realtimePlace.isPresent()) {
+                System.out.println("\tuser already has a realtime place: " + realtimePlace.get().getPlaceId());
+                throw new ConflictException("User " + userCurrent.getUserId() + " already has a realtime place: " + realtimePlace.get().getPlaceId());
+            }
+        }
+
         if (Objects.isNull(placeCreationDTO.getLatitude())) throw new IllegalArgumentException("Latitude is required");
         if (Objects.isNull(placeCreationDTO.getLongitude())) throw new IllegalArgumentException("Longitude is required");
         if (Objects.isNull(placeCreationDTO.getName())) throw new IllegalArgumentException("Name is required");
+        if (Objects.isNull(placeCreationDTO.getTagIds())) placeCreationDTO.setTagIds((new ArrayList<>()));
 
         Place place = new Place(placeCreationDTO, userCurrent.getUserId());
         System.out.println("\tcreated place: " + place.getPlaceId());

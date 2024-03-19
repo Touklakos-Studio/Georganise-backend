@@ -24,4 +24,6 @@ public interface PlacesRepository extends JpaRepository<Place, Long> {
     Optional<List<Place>> findByVicinityAndUserId(BigDecimal minLongitude, BigDecimal maxLongitude, BigDecimal minLatitude, BigDecimal maxLatitude, Long userId);
 
     List<Place> findByImageId(Long imageId);
+
+    Optional<Place> findByUserIdAndName(Long userId, String s);
 }
