@@ -251,7 +251,7 @@ def innit_data(nb_users, nb_tags, nb_images):
     
     places_tags_list = []
     for place in places_list:
-        tags_user = [tag for tag in tags_list[nb_tags:] if tag.user == place.user]
+        tags_user = [tag for tag in tags_list[nb_users:] if tag.user == place.user]
         places_tags_list_temp = [places_tags(place) for _ in range(random.randint(0, len(tags_user)))]
         print(place)
         for place_tag in places_tags_list_temp:
@@ -265,13 +265,12 @@ def innit_data(nb_users, nb_tags, nb_images):
         places_tags_list.extend(places_tags_list_temp)
 
     tokens_list = []
-    for tag in tags_list:
+    for tag in tags_list[nb_users:]:
         for user in users_list:
-            if random.randint(0, 3):
+            if tag.user.id == user.id:
+                continue
+            if random.randint(0, 10):
                 tokens_list.append(tokens(tag, user))
-        
-        if random.randint(0, 2):
-            tokens_list.append(tokens(tag))
 
     return users_list, places_list, tags_list, places_tags_list, tokens_list, image_list
 
