@@ -108,13 +108,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}{{path}}/keyword/Place",
+					"raw": "{{url}}{{path}}/keyword/Beach",
 					"host": [
 						"{{url}}{{path}}"
 					],
 					"path": [
 						"keyword",
-						"Place"
+						"Beach"
 					]
 				}
 			},
@@ -174,7 +174,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\":\"Beach\",\r\n    \"description\":\"A beautifull beach\",\r\n    \"latitude\":0.0,\r\n    \"longitude\":0.0,\r\n    \"imageId\":1,\r\n    \"tagIds\":[\r\n        1,\r\n        2\r\n    ]\r\n}",
+					"raw": "{\r\n    \"name\":\"Beach\",\r\n    \"description\":\"A beautifull beach\",\r\n    \"latitude\":0.0,\r\n    \"longitude\":0.0,\r\n    \"imageId\":null,\r\n    \"tagIds\":[],\r\n    \"realtime\":true\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -197,7 +197,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\":\"Mountain\",\r\n    \"description\":\"A snowy peak\",\r\n    \"latitude\":0.0,\r\n    \"longitude\":0.0,\r\n    \"imageId\":1,\r\n    \"tagIds\":[\r\n        1,\r\n        2\r\n    ]\r\n}",
+					"raw": "{\r\n    \"name\":\"Mountain\",\r\n    \"description\":\"A snowy peak\",\r\n    \"latitude\":0.0,\r\n    \"longitude\":0.0,\r\n    \"imageId\":1,\r\n    \"tagIds\":[2]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"

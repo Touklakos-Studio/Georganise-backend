@@ -143,25 +143,18 @@ class places:
 
 class tags:
     ids = count(1)
-    def __init__(self, title, description, user):
+    def __init__(self, user, realtime = False):
         self.id = next(self.ids)
         self.user = user
-        self.title = title
-        self.description = description
-        print("Tag" + succes, self)
-
-    def __init__(self, user):
-        self.id = next(self.ids)
-        self.user = user
-        self.generate_data()
+        self.generate_data(realtime)
         print("Tag" + succes, self)
 
     def __str__(self):
         return f"TAG({self.id}, {self.user.id}, {self.title}, {self.description})"
     
-    def generate_data(self):
-        self.title = f"Tag{self.id}"
-        self.description = f"Description{self.id}"
+    def generate_data(self, realtime):
+        self.title = f"Tag{self.id}" if not realtime else "{" + self.user.nickname + "} real time"
+        self.description = f"Description{self.id}" if not realtime else "Real time positions of user: " + self.user.nickname
 
     @staticmethod
     def save_tags(tags):
@@ -244,7 +237,8 @@ class tokens:
 
 def innit_data(nb_users, nb_tags, nb_images):
     users_list = [users() for _ in range(nb_users)]
-    tags_list = [tags(random.choice(users_list)) for _ in range(nb_tags)]
+    tags_list = [tags(user, True) for user in users_list]
+    tags_list.extend([tags(random.choice(users_list)) for _ in range(nb_tags)])
 
     image_list = [images(random.choice(users_list)) for _ in range(nb_images)]
     
