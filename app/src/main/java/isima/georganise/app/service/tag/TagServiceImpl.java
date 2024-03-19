@@ -70,8 +70,11 @@ public class TagServiceImpl implements TagService {
                     tagsToReturn.add(tag);
             }
         }
+        System.out.println("\treturning " + tagsToReturn.size() + " authorized tags");
 
-        System.out.println("\treturning " + tagsToReturn.size() + " tags");
+        tagsToReturn = tagsToReturn.stream().filter(tag -> tag.getTitle().contains("} real time")).toList();
+
+        System.out.println("\treturning " + tagsToReturn.size() + " non realtime tags");
         return tagsToReturn;
     }
 
@@ -118,8 +121,10 @@ public class TagServiceImpl implements TagService {
             List<Token> tokens = tokensRepository.findByUserIdAndTagId(currentUser.getUserId(), tag.getTagId());
             if (!tokens.isEmpty()) tagsToReturn.add(tag);
         }
+        System.out.println("\treturning " + tagsToReturn.size() + " authorized tags");
 
-        System.out.println("\treturning " + tagsToReturn.size() + " tags");
+        tagsToReturn = tagsToReturn.stream().filter(tag -> tag.getTitle().contains("} real time")).toList();
+        System.out.println("\treturning " + tagsToReturn.size() + " non realtime tags");
         return tagsToReturn;
     }
 
@@ -127,6 +132,9 @@ public class TagServiceImpl implements TagService {
     public @NotNull Tag createTag(UUID authToken, @NotNull TagCreationDTO tag) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
         System.out.println("\twith user: " + currentUser.getUserId());
+
+        if (Objects.isNull(tag.getTitle())) throw new IllegalArgumentException("Tag title is required");
+        if (tag.getTitle().contains("} real time")) throw new IllegalArgumentException("Tag title cannot contain } real time");
 
         Optional<Tag> existingTag = tagsRepository.findByTitle(tag.getTitle());
         if (existingTag.isPresent()) {
@@ -147,6 +155,8 @@ public class TagServiceImpl implements TagService {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
         System.out.println("\twith user: " + currentUser.getUserId());
         Tag tag = checkTagAccessRight(id, currentUser, "delete tag of user ");
+
+        if (tag.getTitle().contains("} real time")) throw new IllegalArgumentException("Cannot delete real time tag");
 
         Iterable<PlaceTag> placeTags = placesTagsRepository.findByTag_TagId(id);
         placeTags.forEach(placeTag -> System.out.println("\t\tdeleting placeTag: " + placeTag.getPlaceTagId()));
