@@ -215,7 +215,9 @@ public class PlaceServiceImpl implements PlaceService {
 
         if (placeCreationDTO.isRealtime()) {
             Tag realtimeTag = tagsRepository.findByUserIdAndTitle(userCurrent.getUserId(), "{" + userCurrent.getNickname() + "} real time").orElseThrow(NotFoundException::new);
+            System.out.println("\tfetched realtime tag: " + realtimeTag.getTagId());
             List<Place> realtimePlace = placesRepository.findByTagId(realtimeTag.getTagId());
+            System.out.println("\tfetched " + realtimePlace.size() + " realtime places");
             if (!realtimePlace.isEmpty()) {
                 System.out.println("\tuser already has a realtime place: " + realtimePlace.get(0).getPlaceId());
                 throw new AlreadyCreatedException(realtimePlace.get(0).getPlaceId(), "User " + userCurrent.getUserId() + " already has a realtime place.");
@@ -305,29 +307,31 @@ public class PlaceServiceImpl implements PlaceService {
             System.out.println("\tupdating imageId to: " + place.getImageId() + " from: " + existingPlace.getImageId());
             existingPlace.setImageId(place.getImageId());
         }
-        List<PlaceTag> placeTags = new ArrayList<>();
-        for (Long tagId : place.getTagIds()) {
-            System.out.println("\tupdating tagId: " + tagId);
-            Tag tag = tagsRepository.findById(tagId).orElseThrow(NotFoundException::new);
-            System.out.println("\tfetched tag: " + tag.getTagId());
-            if (!tag.getUserId().equals(existingPlace.getUserId())) {
-                System.out.println("\t\tuser is not owner of tag: " + tag.getTagId());
-                List<Token> tokens = tokensRepository.findByUserIdAndTagId(existingPlace.getUserId(), tag.getTagId());
-                System.out.println("\t\tfetched " + tokens.size() + " tokens");
-                if (tokens.isEmpty()) {
-                    System.out.println("\t\t\tuser has no access token to tag: " + tag.getTagId());
-                    throw new NotFoundException("User " + existingPlace.getUserId() + " has no access token to tag " + tag.getTagId() + ".");
+        if (place.getTagIds() != null) {
+            List<PlaceTag> placeTags = new ArrayList<>();
+            for (Long tagId : place.getTagIds()) {
+                System.out.println("\tupdating tagId: " + tagId);
+                Tag tag = tagsRepository.findById(tagId).orElseThrow(NotFoundException::new);
+                System.out.println("\tfetched tag: " + tag.getTagId());
+                if (!tag.getUserId().equals(existingPlace.getUserId())) {
+                    System.out.println("\t\tuser is not owner of tag: " + tag.getTagId());
+                    List<Token> tokens = tokensRepository.findByUserIdAndTagId(existingPlace.getUserId(), tag.getTagId());
+                    System.out.println("\t\tfetched " + tokens.size() + " tokens");
+                    if (tokens.isEmpty()) {
+                        System.out.println("\t\t\tuser has no access token to tag: " + tag.getTagId());
+                        throw new NotFoundException("User " + existingPlace.getUserId() + " has no access token to tag " + tag.getTagId() + ".");
+                    }
+                    System.out.println("\t\t\tuser has access token: " + tokens.get(0).getTokenId());
                 }
-                System.out.println("\t\t\tuser has access token: " + tokens.get(0).getTokenId());
+                placeTags.add(new PlaceTag(existingPlace, tag));
+                System.out.println("\t\tcreated place tag: " + placeTags.get(placeTags.size() - 1).getPlaceTagId());
             }
-            placeTags.add(new PlaceTag(existingPlace, tag));
-            System.out.println("\t\tcreated place tag: " + placeTags.get(placeTags.size() - 1).getPlaceTagId());
+            placesTagsRepository.deleteAll(existingPlace.getPlaceTags());
+            System.out.println("\tdeleted place tags: " + existingPlace.getPlaceTags().size());
+            placesTagsRepository.saveAllAndFlush(placeTags);
+            System.out.println("\tsaved place tags: " + placeTags.size());
+            existingPlace.setPlaceTags(placeTags);
         }
-        placesTagsRepository.deleteAll(existingPlace.getPlaceTags());
-        System.out.println("\tdeleted place tags: " + existingPlace.getPlaceTags().size());
-        placesTagsRepository.saveAllAndFlush(placeTags);
-        System.out.println("\tsaved place tags: " + placeTags.size());
-        existingPlace.setPlaceTags(placeTags);
 
         Place existingPlaceUpdated = placesRepository.saveAndFlush(existingPlace);
         System.out.println("\tupdated place: " + existingPlaceUpdated);
