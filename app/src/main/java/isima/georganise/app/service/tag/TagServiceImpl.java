@@ -72,7 +72,7 @@ public class TagServiceImpl implements TagService {
         }
         System.out.println("\treturning " + tagsToReturn.size() + " authorized tags");
 
-        tagsToReturn = tagsToReturn.stream().filter(tag -> tag.getTitle().contains("} real time")).toList();
+        tagsToReturn = tagsToReturn.stream().filter(tag -> !tag.getTitle().contains("} real time")).toList();
 
         System.out.println("\treturning " + tagsToReturn.size() + " non realtime tags");
         return tagsToReturn;
@@ -123,7 +123,7 @@ public class TagServiceImpl implements TagService {
         }
         System.out.println("\treturning " + tagsToReturn.size() + " authorized tags");
 
-        tagsToReturn = tagsToReturn.stream().filter(tag -> tag.getTitle().contains("} real time")).toList();
+        tagsToReturn = tagsToReturn.stream().filter(tag -> !tag.getTitle().contains("} real time")).toList();
         System.out.println("\treturning " + tagsToReturn.size() + " non realtime tags");
         return tagsToReturn;
     }
