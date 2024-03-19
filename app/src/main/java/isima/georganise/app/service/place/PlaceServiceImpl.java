@@ -103,6 +103,15 @@ public class PlaceServiceImpl implements PlaceService {
 
     @NotNull
     private List<Place> removeUnauthorizedPlace(List<Place> places, User userCurrent) {
+        places = places.stream().filter(place -> {
+            for (PlaceTag placeTag : place.getPlaceTags()) {
+                if (placeTag.getTag().getTitle().contains("} real time")) {
+                    return false;
+                }
+            }
+            return true;
+        }).toList();
+
         List<Place> placesToReturn = new ArrayList<>();
         for (Place place : places) {
             if (place.getUserId().equals(userCurrent.getUserId())) {
@@ -127,6 +136,11 @@ public class PlaceServiceImpl implements PlaceService {
         System.out.println("\twith user: " + userCurrent.getUserId());
         Tag tag = tagsRepository.findById(id).orElseThrow(NotFoundException::new);
         System.out.println("\tfetched tag: " + tag.getTagId());
+
+        if (tag.getTitle().contains("} real time")) {
+            System.out.println("\ttag is real time");
+            throw new NotFoundException("Tag " + tag.getTagId() + " is real time.");
+        }
 
         if (!tag.getUserId().equals(userCurrent.getUserId())) {
             System.out.println("\t\tuser is not owner of tag: " + tag.getTagId());
@@ -188,6 +202,9 @@ public class PlaceServiceImpl implements PlaceService {
             throw new NotFoundException("User " + userCurrent.getUserId() + " has no places in vicinity " + dto + ".");
         }
 
+        places = removeUnauthorizedPlace(places, userCurrent);
+        System.out.println("\treturning " + places.size() + " authorized places");
+
         return places;
     }
 
@@ -217,6 +234,10 @@ public class PlaceServiceImpl implements PlaceService {
         System.out.println("\tfetched " + tags.size() + " tags");
         List<PlaceTag> placeTags = new ArrayList<>();
         for (Tag tag : tags) {
+            if (tag.getTitle().contains("} real time")) {
+                System.out.println("\ttag is real time");
+                throw new NotFoundException("Tag " + tag.getTagId() + " is real time.");
+            }
             if (!tag.getUserId().equals(userCurrent.getUserId())) {
                 System.out.println("\t\tuser is not owner of tag: " + tag.getTagId());
                 List<Token> tokens = tokensRepository.findByUserIdAndTagId(userCurrent.getUserId(), tag.getTagId());
@@ -349,6 +370,23 @@ public class PlaceServiceImpl implements PlaceService {
 
         System.out.println("\tuser is owner of place: " + existingPlace.getPlaceId());
         return existingPlace;
+    }
+
+    @Override
+    public Place getRealtimePlace(UUID authToken) {
+        User userCurrent = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
+        System.out.println("\twith user: " + userCurrent.getUserId());
+        Tag realtimeTag = tagsRepository.findByUserIdAndTitle(userCurrent.getUserId(), "{" + userCurrent.getNickname() + "} real time").orElseThrow(NotFoundException::new);
+        System.out.println("\tfetched realtime tag: " + realtimeTag.getTagId());
+        List<Place> realtimePlace = placesRepository.findByTagId(realtimeTag.getTagId());
+        System.out.println("\tfetched " + realtimePlace.size() + " realtime places");
+
+        if (realtimePlace.isEmpty()) {
+            System.out.println("\tuser has no realtime place");
+            throw new NotFoundException("User " + userCurrent.getUserId() + " has no realtime place.");
+        }
+
+        return realtimePlace.get(0);
     }
 }
 
