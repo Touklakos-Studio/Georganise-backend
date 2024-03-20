@@ -5,21 +5,14 @@ import math
 import random
 import uuid
 import base64
+import os
 
 succes = " created successfully"
-image_path = "Ressources/blobfish.jpg"
-path = "./Database/Script/"
+path = os.path.dirname(os.path.abspath(__file__))
+image_path = [f"{path}\\Ressources\\{f}" for f in os.listdir(path + "\\Ressources\\") if os.path.isfile(os.path.join(path + "\\Ressources\\", f))]
 
 class users:
     ids = count(1)
-    def __init__(self, nickname, email, password):
-        self.id = next(self.ids)
-        self.nickname = nickname
-        self.email = email
-        self.password = password
-        self.token = None
-        print("User" + succes, self)
-
     def __init__(self):
         self.id = next(self.ids)
         self.generate_data()
@@ -40,7 +33,7 @@ class users:
     
     @staticmethod
     def save_users(users):
-        with open(path + 'users.csv', 'w', newline='') as csvfile:
+        with open(path + '\\users.csv', 'w', newline='') as csvfile:
             fieldnames = ['ID', 'NICKNAME', 'EMAIL', 'PASSWORD', 'TOKEN']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
@@ -49,15 +42,6 @@ class users:
 
 class images:
     ids = count(1)
-    def __init__(self, image, name, description, user, public):
-        self.id = next(self.ids)
-        self.user = user
-        self.image = image
-        self.name = name
-        self.description = description
-        self.public = public
-        print("Image" + succes, self)
-
     def __init__(self, user):
         self.id = next(self.ids)
         self.user = user
@@ -68,7 +52,7 @@ class images:
         return f"IMAGE({self.id}, {self.user.id}, {self.image[:10]}, {self.name}, {self.description})"
     
     def generate_data(self):
-        with open(path + image_path, "rb") as f:
+        with open(random.choice(image_path), "rb") as f:
             self.image = base64.b64encode(f.read()).decode('utf-8')
         self.name = f"Image{self.id}"
         self.description = f"Description{self.id}"
@@ -76,7 +60,7 @@ class images:
 
     @staticmethod
     def save_images(images):
-        with open(path + 'images.csv', 'w', newline='') as csvfile:
+        with open(path + '\\images.csv', 'w', newline='') as csvfile:
             fieldnames = ['ID', 'IMAGE', 'NAME', 'DESCRIPTION', 'USERID', 'PUBLIC']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
@@ -85,16 +69,6 @@ class images:
 
 class places:
     ids = count(1)
-    def __init__(self, name, lat, lng, description, image, user):
-        self.id = next(self.ids)
-        self.name = name
-        self.lat = lat
-        self.lng = lng
-        self.description = description
-        self.image = image
-        self.user = user
-        print("Place" + succes, self)
-
     def __init__(self, user, image):
         self.id = next(self.ids)
         self.user = user
@@ -134,7 +108,7 @@ class places:
     
     @staticmethod
     def save_places(places):
-        with open(path + 'places.csv', 'w', newline='') as csvfile:
+        with open(path + '\\places.csv', 'w', newline='') as csvfile:
             fieldnames = ['ID', 'NAME', 'LAT', 'LNG', 'DESCRIPTION', 'IMAGE', 'USER']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
@@ -158,7 +132,7 @@ class tags:
 
     @staticmethod
     def save_tags(tags):
-        with open(path + 'tags.csv', 'w', newline='') as csvfile:
+        with open(path + '\\tags.csv', 'w', newline='') as csvfile:
             fieldnames = ['ID', 'TITLE', 'DESCRIPTION', 'USERID']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
@@ -167,12 +141,6 @@ class tags:
 
 class places_tags:
     ids = count(1)
-    def __init__(self, place, tag):
-        self.id = next(self.ids)
-        self.place = place
-        self.tag = tag
-        print("Place_Tag" + succes, self)
-
     def __init__(self, place):
         self.id = next(self.ids)
         self.place = place
@@ -191,7 +159,7 @@ class places_tags:
     
     @staticmethod
     def save_places_tags(places_tags):
-        with open(path + 'places_tags.csv', 'w', newline='') as csvfile:
+        with open(path + '\\places_tags.csv', 'w', newline='') as csvfile:
             fieldnames = ['ID', 'PLACE', 'TAG']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
@@ -201,15 +169,6 @@ class places_tags:
 
 class tokens:
     ids = count(1)
-    def __init__(self, token, user, right, tag):
-        self.id = next(self.ids)
-        self.token = token
-        self.creator = tag.user
-        self.user = user
-        self.right = right
-        self.tag = tag
-        print("Token" + succes, self)
-
     def __init__(self, tag, user = None):
         self.id = next(self.ids)
         self.creator = tag.user
@@ -227,7 +186,7 @@ class tokens:
 
     @staticmethod
     def save_tokens(tokens):
-        with open(path + 'tokens.csv', 'w', newline='') as csvfile:
+        with open(path + '\\tokens.csv', 'w', newline='') as csvfile:
             fieldnames = ['ID', 'TOKEN', 'USER', 'RIGHT', 'TAG', 'CREATORID']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
@@ -253,24 +212,15 @@ def innit_data(nb_users, nb_tags, nb_images):
     for place in places_list:
         tags_user = [tag for tag in tags_list[nb_users:] if tag.user == place.user]
         places_tags_list_temp = [places_tags(place) for _ in range(random.randint(0, len(tags_user)))]
-        print(place)
         for place_tag in places_tags_list_temp:
-            print(place_tag)
             tag = random.choice(tags_user)
             while not place_tag.add_tag(tag):
                 tag = random.choice(tags_user)
             tags_user.remove(tag)
-            print(place_tag)
 
         places_tags_list.extend(places_tags_list_temp)
 
-    tokens_list = []
-    for tag in tags_list[nb_users:]:
-        for user in users_list:
-            if tag.user.id == user.id:
-                continue
-            if random.randint(0, 10):
-                tokens_list.append(tokens(tag, user))
+    tokens_list = [tokens(tag, user) for tag in tags_list[:nb_users] for user in users_list if tag.user.id != user.id]
 
     return users_list, places_list, tags_list, places_tags_list, tokens_list, image_list
 
