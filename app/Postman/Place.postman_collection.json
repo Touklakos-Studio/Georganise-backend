@@ -44,29 +44,6 @@
 			"response": []
 		},
 		{
-			"name": "getPlaceByIdGPX",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/gpx+xml",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{url}}{{path}}/1",
-					"host": [
-						"{{url}}{{path}}"
-					],
-					"path": [
-						"1"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "getPlacesByUser",
 			"request": {
 				"method": "GET",

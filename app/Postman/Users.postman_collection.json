@@ -38,6 +38,23 @@
 			"response": []
 		},
 		{
+			"name": "getConnectedUser",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}{{path}}/me",
+					"host": [
+						"{{url}}{{path}}"
+					],
+					"path": [
+						"me"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "createUser",
 			"request": {
 				"method": "POST",
@@ -177,23 +194,6 @@
 					],
 					"path": [
 						"logout"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "getConnectedUser",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{url}}{{path}}/me",
-					"host": [
-						"{{url}}{{path}}"
-					],
-					"path": [
-						"me"
 					]
 				}
 			},

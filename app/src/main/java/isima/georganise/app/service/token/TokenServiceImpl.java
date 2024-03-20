@@ -1,6 +1,5 @@
 package isima.georganise.app.service.token;
 
-
 import isima.georganise.app.entity.dao.Tag;
 import isima.georganise.app.entity.dao.Token;
 import isima.georganise.app.entity.dao.User;
@@ -22,15 +21,24 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * Service class for managing tokens.
+ * Implements the TokenService interface.
+ */
 @Service
 public class TokenServiceImpl implements TokenService {
 
     private final @NotNull TokensRepository tokensRepository;
-
     private final @NotNull UsersRepository usersRepository;
-
     private final @NotNull TagsRepository tagsRepository;
 
+    /**
+     * Constructor for the TokenServiceImpl class.
+     *
+     * @param usersRepository The repository for users.
+     * @param tokensRepository The repository for tokens.
+     * @param tagsRepository The repository for tags.
+     */
     @Autowired
     public TokenServiceImpl(@NotNull UsersRepository usersRepository, @NotNull TokensRepository tokensRepository, @NotNull TagsRepository tagsRepository) {
         Assert.notNull(tokensRepository, "Tokens repository must not be null");
@@ -41,161 +49,158 @@ public class TokenServiceImpl implements TokenService {
         this.tagsRepository = tagsRepository;
     }
 
+    /**
+     * Retrieves all tokens associated with the given authentication token.
+     *
+     * @param authToken The authentication token.
+     * @return A list of tokens.
+     */
     @Override
     public @NotNull List<Token> getAllTokens(UUID authToken) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
-        System.out.println("\twith user: " + currentUser.getUserId());
 
-        Iterable<Token> tokens = tokensRepository.findByUserId(currentUser.getUserId()).orElse(new ArrayList<>());
-        System.out.println("\tfetched " + tokens.spliterator().getExactSizeIfKnown() + " tokens");
-
-        return (List<Token>) tokens;
+        return (List<Token>) tokensRepository.findByUserId(currentUser.getUserId()).orElse(new ArrayList<>());
     }
 
+    /**
+     * Retrieves a token by its ID and the given authentication token.
+     *
+     * @param authToken The authentication token.
+     * @param id The ID of the token.
+     * @return The token.
+     */
     @Override
     public @NotNull Token getTokenById(UUID authToken, @NotNull Long id) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
-        System.out.println("\twith user: " + currentUser.getUserId());
         Token token = tokensRepository.findById(id).orElseThrow(NotFoundException::new);
-        System.out.println("\tfetched token: " + token);
 
-        if (!token.getUserId().equals(currentUser.getUserId())) {
-            System.out.println("\tuser " + currentUser.getUserId() + " is not the owner of the token " + token.getTokenId() + " owned by " + token.getUserId());
-            throw new NotFoundException("Token not found");
-        }
+        if (!token.getUserId().equals(currentUser.getUserId())) throw new NotFoundException("Token not found");
 
         return token;
     }
 
+    /**
+     * Retrieves tokens associated with a tag by the tag's ID and the given authentication token.
+     *
+     * @param authToken The authentication token.
+     * @param id The ID of the tag.
+     * @return An iterable of tokens.
+     */
     @Override
-    public @NotNull Iterable<Token> getTokensByTag(UUID authToken, Long id) {
+    public @NotNull Iterable<Token> getTokensByTag(UUID authToken, @NotNull Long id) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
-        System.out.println("\twith user: " + currentUser.getUserId());
 
         Tag tag = tagsRepository.findById(id).orElseThrow(NotFoundException::new);
-        System.out.println("\tfetched tag: " + tag);
 
-        List<Token> tokens;
-        if (tag.getUserId().equals(currentUser.getUserId())) {
-            System.out.println("\tuser " + currentUser.getUserId() + " is the owner of the tag " + tag.getTagId());
-            tokens = tokensRepository.findByCreatorIdAndTagId(currentUser.getUserId(), id);
-            System.out.println("\tfetched " + tokens.size() + " tokens");
-        } else {
-            System.out.println("\tuser " + currentUser.getUserId() + " is not the owner of the tag " + tag.getTagId());
-            tokens = tokensRepository.findByUserIdAndTagId(currentUser.getUserId(), id);
-            System.out.println("\tfetched " + tokens.size() + " tokens");
-        }
+        List<Token> tokens = tag.getUserId().equals(currentUser.getUserId()) ?
+                tokensRepository.findByCreatorIdAndTagId(currentUser.getUserId(), id) :
+                tokensRepository.findByUserIdAndTagId(currentUser.getUserId(), id);
 
-        if (tokens.isEmpty()) {
-            System.out.println("\tno tokens found for tag " + id);
-            throw new NotFoundException("No tokens found for tag " + id);
-        }
+        if (tokens.isEmpty()) throw new NotFoundException("No tokens found for tag " + id);
 
         return tokens;
     }
 
+    /**
+     * Creates a new token with the given authentication token and token creation DTO.
+     *
+     * @param authToken The authentication token.
+     * @param token The token creation DTO.
+     * @return The created token.
+     */
     @Override
     public @NotNull Token createToken(UUID authToken, @NotNull TokenCreationDTO token) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
-        System.out.println("\twith user: " + currentUser.getUserId());
 
         if (Objects.isNull(token.getAccessRight())) throw new IllegalArgumentException("Access right is required");
         if (Objects.isNull(token.getTagId())) throw new IllegalArgumentException("Tag id is required");
 
-        User targetUser = null;
-        if (!Objects.isNull(token.getNickname())) {
-            targetUser = usersRepository.findByNickname(token.getNickname()).orElseThrow(NotFoundException::new);
-            System.out.println("\tfetched user: " + targetUser);
-        }
+        User targetUser = !Objects.isNull(token.getNickname()) ?
+                usersRepository.findByNickname(token.getNickname()).orElseThrow(NotFoundException::new) :
+                null;
 
         Tag tag = tagsRepository.findById(token.getTagId()).orElseThrow(NotFoundException::new);
-        System.out.println("\tfetched tag: " + tag);
 
-        if (!tag.getUserId().equals(currentUser.getUserId())) {
-            System.out.println("\tuser " + currentUser.getUserId() + " is not the owner of the tag " + tag.getTagId() + " owned by " + tag.getUserId());
-            throw new UnauthorizedException(currentUser.getNickname(), "create token for tag " + tag.getTagId());
-        }
+        if (!tag.getUserId().equals(currentUser.getUserId())) throw new UnauthorizedException(currentUser.getNickname(), "create token for tag " + tag.getTagId());
 
-        Token newToken = tokensRepository.saveAndFlush(new Token(token, currentUser.getUserId(), Objects.isNull(targetUser) ? null : targetUser.getUserId()));
-        System.out.println("\tcreated token: " + newToken);
-        return newToken;
+        return tokensRepository.saveAndFlush(new Token(token, currentUser.getUserId(), Objects.isNull(targetUser) ? null : targetUser.getUserId()));
     }
 
+    /**
+     * Deletes a token by its ID and the given authentication token.
+     *
+     * @param authToken The authentication token.
+     * @param id The ID of the token.
+     */
     @Override
     public void deleteToken(UUID authToken, @NotNull Long id) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
-        System.out.println("\twith user: " + currentUser.getUserId());
         Token token = tokensRepository.findById(id).orElseThrow(NotFoundException::new);
-        System.out.println("\tfetched token: " + token);
 
-        if (!token.getCreatorId().equals(currentUser.getUserId())) {
-            System.out.println("\tuser " + currentUser.getUserId() + " is not the owner of the token " + token.getTokenId() + " owned by " + token.getCreatorId());
-            throw new UnauthorizedException(currentUser.getNickname(), "delete token " + id);
-        }
+        if (!token.getCreatorId().equals(currentUser.getUserId())) throw new UnauthorizedException(currentUser.getNickname(), "delete token " + id);
 
         tokensRepository.delete(token);
-        System.out.println("\tdeleted token: " + token);
     }
 
+    /**
+     * Updates a token by its ID, the given authentication token, and token update DTO.
+     *
+     * @param authToken The authentication token.
+     * @param id The ID of the token.
+     * @param token The token update DTO.
+     * @return The updated token.
+     */
     @Override
     public @NotNull Token updateToken(UUID authToken, @NotNull Long id, @NotNull TokenUpdateDTO token) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
-        System.out.println("\twith user: " + currentUser.getUserId());
         Token tokenToUpdate = tokensRepository.findById(id).orElseThrow(NotFoundException::new);
-        System.out.println("\tfetched token: " + tokenToUpdate);
 
-        if (!tokenToUpdate.getCreatorId().equals(currentUser.getUserId())) {
-            System.out.println("\tuser " + currentUser.getUserId() + " is not the owner of the token " + tokenToUpdate.getTokenId() + " owned by " + tokenToUpdate.getCreatorId());
-            throw new UnauthorizedException(currentUser.getNickname(), "update token " + id);
-        }
+        if (!tokenToUpdate.getCreatorId().equals(currentUser.getUserId())) throw new UnauthorizedException(currentUser.getNickname(), "update token " + id);
 
-        if (token.getAccessRight() != null) {
-            System.out.println("\tupdating access right to: " + token.getAccessRight() + " from: " + tokenToUpdate.getAccessRight());
-            tokenToUpdate.setAccessRight(token.getAccessRight());
-        }
+        if (token.getAccessRight() != null) tokenToUpdate.setAccessRight(token.getAccessRight());
 
-        Token newToken = tokensRepository.saveAndFlush(tokenToUpdate);
-        System.out.println("\tupdated token: " + newToken);
-        return newToken;
+        return tokensRepository.saveAndFlush(tokenToUpdate);
     }
 
+    /**
+     * Adds a token to a user by the user's ID and the given authentication token.
+     *
+     * @param authToken The authentication token.
+     * @param token The ID of the token.
+     * @return The token.
+     */
     @Override
     public @NotNull Token addTokenToUser(UUID authToken, @NotNull UUID token) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
-        System.out.println("\twith user: " + currentUser.getUserId());
         Token tokenToUpdate = tokensRepository.findByTokenValue(token).orElseThrow(NotFoundException::new);
-        System.out.println("\tfetched token: " + tokenToUpdate);
 
-        if (tokenToUpdate.getUserId() != null)
-            throw new IllegalArgumentException("Token already has a user assigned");
+        if (tokenToUpdate.getUserId() != null) throw new IllegalArgumentException("Token already has a user assigned");
 
         tokenToUpdate.setUserId(currentUser.getUserId());
 
-        Token newToken = tokensRepository.saveAndFlush(tokenToUpdate);
-        System.out.println("\tupdated token: " + newToken);
-        return newToken;
+        return tokensRepository.saveAndFlush(tokenToUpdate);
     }
 
+    /**
+     * Retrieves tokens associated with a user by the user's ID and the given authentication token.
+     *
+     * @param authToken The authentication token.
+     * @param id The ID of the user.
+     * @param isCreator A flag indicating whether the user is the creator of the tokens.
+     * @return An iterable of tokens.
+     */
     @Override
     public @NotNull Iterable<Token> getTokensByUser(UUID authToken, Long id, boolean isCreator) {
         User currentUser = usersRepository.findByAuthToken(authToken).orElseThrow(NotLoggedException::new);
-        System.out.println("\twith user: " + currentUser.getUserId());
 
-        if (!currentUser.getUserId().equals(id))
-            throw new UnauthorizedException(currentUser.getNickname(), "get tokens of user " + id);
+        if (!currentUser.getUserId().equals(id)) throw new UnauthorizedException(currentUser.getNickname(), "get tokens of user " + id);
 
-        Iterable<Token> tokens;
-        if (isCreator) {
-            tokens = tokensRepository.findByCreatorId(id).orElseThrow(NotFoundException::new);
-        } else {
-            tokens = tokensRepository.findByUserId(id).orElseThrow(NotFoundException::new);
-        }
-        System.out.println("\tfetched " + tokens.spliterator().getExactSizeIfKnown() + " tokens");
+        Iterable<Token> tokens = isCreator ?
+                tokensRepository.findByCreatorId(id).orElseThrow(NotFoundException::new) :
+                tokensRepository.findByUserId(id).orElseThrow(NotFoundException::new);
 
-        if (!tokens.iterator().hasNext())
-            throw new NotFoundException("No tokens found for user " + id);
+        if (!tokens.iterator().hasNext()) throw new NotFoundException("No tokens found for user " + id);
 
         return tokens;
     }
 }
-
