@@ -220,7 +220,7 @@ def innit_data(nb_users, nb_tags, nb_images):
 
         places_tags_list.extend(places_tags_list_temp)
 
-    tokens_list = [tokens(tag, user) for tag in tags_list[:nb_users] for user in users_list if tag.user.id != user.id]
+    tokens_list = [tokens(tag, user) for tag in tags_list[nb_users:] for user in users_list if tag.user.id != user.id]
 
     return users_list, places_list, tags_list, places_tags_list, tokens_list, image_list
 
